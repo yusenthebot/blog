@@ -4,8 +4,9 @@
   fix_spacing.py SLUG [SLUG ...] [--write]
   fix_spacing.py --all [--write]
 
-Adds one space between Chinese characters and Latin letters or digits, and removes the space
-after Chinese closing punctuation before more Chinese (the `）](url) 和` case after a link).
+Adds one space between Chinese characters and Latin letters or digits, removes the space
+after Chinese closing punctuation before more Chinese (the `）](url) 和` case after a link),
+and turns straight "..." quotes into Chinese “...” (smartypants renders them as ”...”).
 Math, code, URLs, HTML comments and the frontmatter are left untouched; captions are fixed.
 """
 
@@ -42,6 +43,22 @@ def fix_text(s: str) -> str:
     return s
 
 
+# Image titles ("caption") are Markdown syntax: never turn their quotes into curly ones.
+PROTECT_QUOTES = re.compile(PROTECT.pattern + r'|"[^"\n]*"\)', re.DOTALL)
+STRAIGHT_PAIR = re.compile(r'"([^"\n]{1,80}?)"')
+
+
+def fix_quotes(body: str) -> str:
+    """Turn straight "..." in Chinese prose into “...”; smartypants otherwise renders both as closing quotes."""
+    out, last = [], 0
+    for m in PROTECT_QUOTES.finditer(body):
+        out.append(STRAIGHT_PAIR.sub(r"“\1”", body[last : m.start()]))
+        out.append(m.group(0))
+        last = m.end()
+    out.append(STRAIGHT_PAIR.sub(r"“\1”", body[last:]))
+    return "".join(out)
+
+
 def fix_body(body: str) -> str:
     out, last = [], 0
     for m in PROTECT.finditer(body):
@@ -49,7 +66,7 @@ def fix_body(body: str) -> str:
         out.append(m.group(0))
         last = m.end()
     out.append(fix_text(body[last:]))
-    joined = "".join(out)
+    joined = fix_quotes("".join(out))
     # A link target ends the protected span, so `）](url) 和` is fixed here, after re-joining.
     return re.sub(rf"([{CLOSE}])\]\(([^)\s]+)\) +(?=[{CJK}])", r"\1](\2)", joined)
 

@@ -24,6 +24,12 @@ from blog_paths import POSTS, SLUG, check_root, split_post
 REQUIRED = ("title", "description", "date", "series", "tags", "cover", "coverAlt", "platforms", "links")
 REQUIRED_KEPU = ("episode", "duration")
 LENGTH = (2500, 5000)
+# Captions are one-sentence summaries; values and panel walkthroughs go in the text (2026-11-09).
+CAPTION_MAX = 60
+MEASURED = re.compile(
+    r"\d[\d.,]*\s*(?:%|％|ms|Hz|N\b|mm|cm|m\b|s\b|kg|g\b|秒|毫秒|厘米|毫米|米|小时|次|轮|个|只|条|步|倍|弧度|度)"
+)
+PANELS = re.compile(r"[（(][a-d][)）]|Figure\s*\d")
 MIN_DISPLAY_EQ = 3
 
 CJK = r"㐀-䶿一-鿿"
@@ -102,12 +108,18 @@ def check_images(body: str, folder: Path, r: Report) -> None:
             r.errors.append(f"image without alt text: {src}")
         if not title:
             r.errors.append(f"image without a caption (the title slot): {src}")
+        elif len(title) > CAPTION_MAX:
+            r.errors.append(f"caption of {src} has {len(title)} characters; summarise it in {CAPTION_MAX} or fewer")
+        elif MEASURED.search(title) or PANELS.search(title):
+            r.warnings.append(f"caption of {src} lists values or panels; keep it to a summary: {title[:30]}")
 
 
 def check_prose(body: str, r: Report) -> None:
     captions = "\n".join(re.findall(r'!\[[^\]]*\]\([^)\s]+\s+"([^"]*)"\)', body))
     prose = strip_non_prose(body) + "\n" + strip_non_prose(captions)
     for i, line in enumerate(prose.splitlines(), 1):
+        if re.search(rf'"[^"]*[{CJK}]', line):
+            r.errors.append(f"straight quotes in Chinese text (run fix_spacing.py): {line.strip()[:40]}")
         if "—" in line:
             r.errors.append(f"em dash: {line.strip()[:40]}")
         if re.search(rf" [{CJK_PUNCT}]|（ |[{CJK_PUNCT}] [{CJK}]", line):

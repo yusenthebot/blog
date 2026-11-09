@@ -10,6 +10,7 @@ The loose spoken shuorenhua voice used for 小红书 and TikTok copy does NOT ap
 - One space between Chinese and Latin letters, digits or inline math (`在 MuJoCo 中训练 3 个种子`, `状态 $x_t$ 的`); none before or after Chinese punctuation. `fix_spacing.py` fixes this mechanically.
 - English technical terms stay in English; the first use of an acronym gets its full name once: `扩展卡尔曼滤波（Extended Kalman Filter，EKF）`.
 - Be precise: what is simulated, how many seeds, what a metric measures, what is schematic.
+- Quotation marks are Chinese “…”, never straight "…" (smartypants turns those into ”…” next to Chinese text).
 - One sentence per source line (the author's Markdown convention); the `rehype-cjk-linebreak` plugin removes the stray space a line break would otherwise leave between Chinese sentences.
 
 ## Structure

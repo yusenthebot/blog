@@ -33,3 +33,7 @@ Each of these cost a round on the first build (2026-11-09).
 ## Layout
 
 - Wide figures once had `margin: 0 -7rem`: the right side ran 56 px under the sticky contents list and the left side overflowed near 1121 px. They now grow left only, by the margin that is actually free. After any layout change, measure every post at 375, 1000, 1140, 1280, 1440 and 1920 px for elements crossing the contents list and for horizontal scroll, not just one screenshot.
+- `text-wrap: balance` alone split a title inside a word (训 / 练), and `keep-all` alone left a lone character (级) after a long run without spaces; word-level `<wbr>` from Intl.Segmenter fixed both. After a headline change, scan every headline at 375, 1000 and 1440 px for a last line under 18 % of the box.
+- Headless Chrome cannot go below a 500 px viewport (`--window-size=390,...` still lays out at 500): check phones in the browser pane with the mobile preset, not with headless screenshots.
+- A cover cut mid-transition (EP13's first cover) shows half-drawn text; always look at the cover at full size.
+- Changing Markdown, rehype plugins or captions while `astro dev` runs often serves stale HTML: stop the server, `rm -rf .astro node_modules/.vite`, start it again, then check with curl before screenshots.

@@ -30,6 +30,14 @@ One accent only; no gradients, glows, scanlines or shadows.
 - Post: title, lede, meta and tags; the video block (click-to-load youtube-nocookie, or the "即将上传到 YouTube" placeholder); the article in a 46 rem column with a sticky 13 rem contents list on the right above 1120 px; `fig-*` images grow into the free left margin (up to 10 rem, never to the right, where the sticky contents list sits); the contents list scrolls on its own when taller than the window; display math scrolls sideways when it overflows; a numbered REFERENCES list; prev/next pager.
 - Header: `YUSEN_BLOG` with a blinking cursor, nav posts / about / ~/home. Footer: rss / github / home.
 
+## Typesetting rules
+
+- Chinese headlines (post and card titles, `h2`/`h3`, pager) use `word-break: keep-all` plus `text-wrap: balance`, and break only at the `<wbr>` that `src/lib/cjk-words.mjs` inserts between Chinese words (Intl.Segmenter, single characters merged into their neighbours, punctuation attached to the word before it). Titles render through `wbrHtml()`; Markdown headings get the same through the `rehypeCjkHeadings` plugin. Result: no line ends inside a word like 训练 and no lone character on a last line.
+- Running text uses `text-wrap: pretty`.
+- Tables sit in a `.table-wrap` scroll box at full column width; cells of 24 characters or fewer get class `nw` and never wrap, so values like `94.5 / 71.1 / 81.6%` stay on one line.
+- Straight quotes in Chinese prose render as ”…” through smartypants; posts use “…” (`fix_spacing.py` converts them).
+- Phones: the three filter buttons fit one row (tighter padding below 640 px).
+
 ## Where things are
 
 | File | Holds |
@@ -39,7 +47,8 @@ One accent only; no gradients, glows, scanlines or shadows.
 | `src/pages/index.astro` | home and the filter script |
 | `src/pages/posts/[slug].astro` | the post page, contents list, references |
 | `src/components/PostCard.astro`, `Video.astro` | card and video block |
-| `src/lib/rehype-figure.mjs` | image-only paragraphs with a title become `<figure>` with `<figcaption>`; `fig-` files get the wide class |
+| `src/lib/rehype-figure.mjs` | image-only paragraphs with a title become `<figure>` with `<figcaption>`; `fig-` files get the wide class; tables get the scroll wrapper and `nw` cells |
+| `src/lib/cjk-words.mjs` | word-level `<wbr>` for Chinese headlines (`wbrHtml`, `rehypeCjkHeadings`) |
 | `src/lib/rehype-cjk-linebreak.mjs` | removes the space a source line break leaves between Chinese sentences |
 | `src/lib/site.ts` | site name, title, description, series labels |
 

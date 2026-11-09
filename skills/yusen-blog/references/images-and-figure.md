@@ -24,7 +24,7 @@ Every post gets one main figure drawn with the `block-diagram-drawer` skill: loa
 - Canvas 1400 by 480 to 560, three or four panels `(a)` to `(d)`, text-width print target.
 - Content: the episode's core mechanism plus our experiment and its real numbers when there is one. Numbers come from the planning files, never invented.
 - Real imagery: crops of film frames in the panels via `f.image()` (crop subtitles and on-screen notes out).
-- Labels are English technical names with symbols; one short Chinese word is fine where the film uses it. Explanations go in the caption.
+- Labels are English technical names with symbols; one short Chinese word is fine where the film uses it. Explanations go in the article text; the caption only summarises.
 - figkit math supports `\hat \bar \tilde \mathrm \mathbb \mathcal`, sub- and superscripts and the symbols in its table (`\partial \top \delta \lambda \mu ...`). It does not support `\mathbf`, `\nu`, `\left`, `\frac`; check a symbol renders before relying on it.
 - Gate: `cd figures/src && python3 fig_<x>.py && python3 qa_svg_figure.py ../<slug>-figure.svg --png --strict-tidy` until it prints PASS, then open the PNG: no cut-off text in crops, no empty half-cards, arrows the right way. At least three gate-and-look cycles.
 - Never put licence-restricted footage in a figure (MacMimic's rollout frames derive from LAFAN1, CC BY-NC-ND).
@@ -32,10 +32,11 @@ Every post gets one main figure drawn with the `block-diagram-drawer` skill: loa
 ## In the Markdown
 
 ```markdown
-![框图：一句话说图里有什么](./fig-rl.png "图注：先说这张图展示什么，再逐个面板解释，最后说明哪些部分是示意。")
+![PPO 的打分、比较和裁剪，随机化训练的对比，写错的 reward](./fig-rl.png "Go2 的 PPO 训练流程，以及域随机化和错误 reward 两个对照实验。")
 ```
 
-- The alt text describes the image; the title slot is the caption, rendered as `<figcaption>`.
+- The alt text describes the image; the title slot is the caption, rendered as `<figcaption>` after an automatic `FIG.n` label.
+- Captions are short summaries (the author, 2026-11-09): one sentence, at most 60 characters, saying what the image shows. No measured values or settings, no panel-by-panel walkthrough, no "Figure 1" prefix. The numbers and the explanation belong in the article text next to the image. Add "（示意）" when the image is schematic.
 - A file named `fig-*` grows into the free left margin on wide screens (never to the right, where the contents list is); stills stay at text width.
 - Put the block diagram where the method section starts; put each still next to the paragraph it illustrates.
 - Captions follow the same language rules as the article (`writing.md`), including a space between Chinese and Latin text.
