@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 import { SERIES, formatDate, withBase } from "../lib/site";
 import { postPath, type Post } from "../lib/posts";
+import { wbrHtml } from "../lib/cjk-words.mjs";
 
 interface Props {
   post: Post;
@@ -30,7 +31,7 @@ const { data } = post;
         <span>{SERIES[data.series].label}</span>
         <time datetime={data.date.toISOString()}>{formatDate(data.date)}</time>
       </div>
-      <h2 class="card-title">{data.title}</h2>
+      <h2 class="card-title" set:html={wbrHtml(data.title)} />
       <p class="card-desc">{data.description}</p>
     </div>
   </a>

@@ -5,6 +5,7 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { rehypeFigure } from "./src/lib/rehype-figure.mjs";
 import { rehypeCjkLinebreak } from "./src/lib/rehype-cjk-linebreak.mjs";
+import { rehypeCjkHeadings } from "./src/lib/cjk-words.mjs";
 
 // Served from GitHub Pages as a project site: https://yusenthebot.github.io/blog/
 export default defineConfig({
@@ -13,7 +14,7 @@ export default defineConfig({
   trailingSlash: "always",
   integrations: [sitemap()],
   markdown: {
-    processor: unified({ remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex, rehypeFigure, rehypeCjkLinebreak] }),
+    processor: unified({ remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex, rehypeFigure, rehypeCjkLinebreak, rehypeCjkHeadings] }),
     shikiConfig: { theme: "github-light" },
   },
 });

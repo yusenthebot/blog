@@ -6,6 +6,7 @@ import Base from "../../layouts/Base.astro";
 import Video from "../../components/Video.astro";
 import { getPosts, postPath, type Post } from "../../lib/posts";
 import { SERIES, formatDate, withBase } from "../../lib/site";
+import { wbrHtml } from "../../lib/cjk-words.mjs";
 
 export async function getStaticPaths() {
   const posts = await getPosts();
@@ -37,7 +38,7 @@ const isVideo = data.series === "kepu" || data.video;
       <div class="crumbs">
         <a href={withBase("/")}>~/posts</a>/{post.id}
       </div>
-      <h1 class="article-title px">{data.title}</h1>
+      <h1 class="article-title px" set:html={wbrHtml(data.title)} />
       <p class="article-lede">{data.description}</p>
       <div class="meta">
         {data.episode && <span class="ep">EP{String(data.episode).padStart(2, "0")}</span>}
@@ -105,7 +106,7 @@ const isVideo = data.series === "kepu" || data.video;
         older && (
           <a href={withBase(postPath(older))}>
             <span class="dir">&lt; older</span>
-            <span class="t">{older.data.title}</span>
+            <span class="t" set:html={wbrHtml(older.data.title)} />
           </a>
         )
       }
@@ -113,7 +114,7 @@ const isVideo = data.series === "kepu" || data.video;
         newer && (
           <a class="next" href={withBase(postPath(newer))}>
             <span class="dir">newer &gt;</span>
-            <span class="t">{newer.data.title}</span>
+            <span class="t" set:html={wbrHtml(newer.data.title)} />
           </a>
         )
       }

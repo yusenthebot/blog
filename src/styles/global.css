@@ -624,7 +624,7 @@ iframe {
 }
 
 .prose h2 {
-  margin-top: 2.6em;
+  margin-top: 2em;
   font-family: var(--font-pixel);
   font-size: 36px;
   font-weight: 400;
@@ -639,7 +639,7 @@ iframe {
 }
 
 .prose h3 {
-  margin-top: 2em;
+  margin-top: 1.8em;
   font-family: var(--font-pixel);
   font-size: 24px;
   font-weight: 400;
@@ -727,13 +727,21 @@ iframe {
   margin: 2.6em 0;
 }
 
+.prose .table-wrap {
+  overflow-x: auto;
+}
+
 .prose table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13.5px;
   line-height: 1.6;
-  display: block;
-  overflow-x: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.prose td.nw,
+.prose th.nw {
+  white-space: nowrap;
 }
 
 .prose th,
@@ -774,7 +782,12 @@ iframe {
    (the article grid is 46rem + 56px + 13rem = 1000px, centred). */
 @media (min-width: 1121px) {
   .prose figure.fig.wide {
-    margin-left: calc(-1 * clamp(0px, (100vw - 1000px) / 2 - 2 * var(--gutter), 10rem));
+    --grow: clamp(0px, (100vw - 1000px) / 2 - 2 * var(--gutter), 10rem);
+  }
+  .prose figure.fig.wide img {
+    margin-left: calc(-1 * var(--grow));
+    width: calc(100% + var(--grow));
+    max-width: none;
   }
 }
 
@@ -1065,5 +1078,41 @@ iframe {
   .card.feature .card-title {
     font-size: 24px;
     line-height: 1.5;
+  }
+}
+
+/* Headlines wrap into even lines (no single character left alone on the last line);
+   running text avoids a lone character at the end of a paragraph. */
+.article-title,
+.card-title,
+.prose h2,
+.prose h3,
+.pager .t,
+.hero-lede .zh {
+  text-wrap: balance;
+  /* Break Chinese headlines at spaces and punctuation, not inside a word like 训练;
+     a run too long for the line still breaks anywhere instead of overflowing. */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.prose p,
+.prose li,
+.prose figcaption,
+.card-desc,
+.article-lede {
+  text-wrap: pretty;
+}
+
+/* Phones: the three filters fit on one row (about 310 px of 343 px). */
+@media (max-width: 640px) {
+  .filters {
+    gap: 4px;
+  }
+  .filter {
+    padding: 5px 8px 6px;
+  }
+  .filter .n {
+    margin-left: 6px;
   }
 }
