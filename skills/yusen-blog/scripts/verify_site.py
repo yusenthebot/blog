@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -28,6 +29,16 @@ TIMEOUT = 20
 
 
 def get(url: str) -> tuple[int | str, str]:
+    """GET with up to two retries on network errors (TLS resets happen on the Pages CDN)."""
+    for attempt in range(3):
+        status, body = _get_once(url)
+        if not (isinstance(status, str) and status.startswith("ERR")):
+            break
+        time.sleep(1 + attempt)
+    return status, body
+
+
+def _get_once(url: str) -> tuple[int | str, str]:
     try:
         with urllib.request.urlopen(
             urllib.request.Request(url, headers={"User-Agent": "yusen-blog-verify"}), timeout=TIMEOUT
