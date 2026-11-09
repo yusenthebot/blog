@@ -29,3 +29,7 @@ Each of these cost a round on the first build (2026-11-09).
 
 - figkit math breaks on `\mathbf`, `\nu` and `\partialx` (write `\partial x`); use plain symbols and `\delta`.
 - The gate fails on word budget, overlaps and half-in-panel elements: cut labels and move explanations to the caption before resizing anything.
+
+## Layout
+
+- Wide figures once had `margin: 0 -7rem`: the right side ran 56 px under the sticky contents list and the left side overflowed near 1121 px. They now grow left only, by the margin that is actually free. After any layout change, measure every post at 375, 1000, 1140, 1280, 1440 and 1920 px for elements crossing the contents list and for horizontal scroll, not just one screenshot.

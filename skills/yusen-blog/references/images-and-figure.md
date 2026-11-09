@@ -36,6 +36,6 @@ Every post gets one main figure drawn with the `block-diagram-drawer` skill: loa
 ```
 
 - The alt text describes the image; the title slot is the caption, rendered as `<figcaption>`.
-- A file named `fig-*` is rendered wider than the text column; stills stay at text width.
+- A file named `fig-*` grows into the free left margin on wide screens (never to the right, where the contents list is); stills stay at text width.
 - Put the block diagram where the method section starts; put each still next to the paragraph it illustrates.
 - Captions follow the same language rules as the article (`writing.md`), including a space between Chinese and Latin text.

@@ -27,7 +27,7 @@ One accent only; no gradients, glows, scanlines or shadows.
 ## Layout
 
 - Home: hero (prompt line, `YUSEN_BLOG`, pixel tagline, English lede, POSTS / VIDEOS / UPDATED stats), filter buttons (all, 科普视频, 图文; synced to `?s=`), then a card grid of 3 columns (2 below 960 px, 1 below 640 px). The first visible card is a full-width feature card.
-- Post: title, lede, meta and tags; the video block (click-to-load youtube-nocookie, or the "即将上传到 YouTube" placeholder); the article in a 46 rem column with a sticky 13 rem contents list on the right above 1120 px; `fig-*` images 7 rem wider than the column on wide screens; display math scrolls sideways when it overflows; a numbered REFERENCES list; prev/next pager.
+- Post: title, lede, meta and tags; the video block (click-to-load youtube-nocookie, or the "即将上传到 YouTube" placeholder); the article in a 46 rem column with a sticky 13 rem contents list on the right above 1120 px; `fig-*` images grow into the free left margin (up to 10 rem, never to the right, where the sticky contents list sits); the contents list scrolls on its own when taller than the window; display math scrolls sideways when it overflows; a numbered REFERENCES list; prev/next pager.
 - Header: `YUSEN_BLOG` with a blinking cursor, nav posts / about / ~/home. Footer: rss / github / home.
 
 ## Where things are
