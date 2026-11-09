@@ -1,0 +1,122 @@
+---
+import "katex/dist/katex.min.css";
+import { render } from "astro:content";
+import { getImage } from "astro:assets";
+import Base from "../../layouts/Base.astro";
+import Video from "../../components/Video.astro";
+import { getPosts, postPath, type Post } from "../../lib/posts";
+import { SERIES, formatDate, withBase } from "../../lib/site";
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    // posts are newest first: "newer" is the previous one in the list
+    props: { post, newer: posts[i - 1], older: posts[i + 1] },
+  }));
+}
+
+interface Props {
+  post: Post;
+  newer?: Post;
+  older?: Post;
+}
+
+const { post, newer, older } = Astro.props;
+const { data } = post;
+const { Content, headings } = await render(post);
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const og = await getImage({ src: data.cover, width: 1200, format: "jpg" });
+const PLATFORM_LABEL = { douyin: "抖音", xiaohongshu: "小红书", tiktok: "TikTok", youtube: "YouTube" } as const;
+const isVideo = data.series === "kepu" || data.video;
+---
+
+<Base title={data.title} description={data.description} image={og.src} type="article">
+  <article class="article">
+    <header class="article-head">
+      <div class="crumbs">
+        <a href={withBase("/")}>~/posts</a>/{post.id}
+      </div>
+      <h1 class="article-title px">{data.title}</h1>
+      <p class="article-lede">{data.description}</p>
+      <div class="meta">
+        {data.episode && <span class="ep">EP{String(data.episode).padStart(2, "0")}</span>}
+        <span>{SERIES[data.series].label}</span>
+        <time datetime={data.date.toISOString()}>{formatDate(data.date)}</time>
+        {data.duration && <span>{data.duration}</span>}
+        {data.platforms.length > 0 && <span>{data.platforms.map((p) => PLATFORM_LABEL[p]).join(" / ")}</span>}
+      </div>
+      {
+        data.tags.length > 0 && (
+          <div class="tags">
+            {data.tags.map((t) => (
+              <span class="tag">#{t}</span>
+            ))}
+          </div>
+        )
+      }
+    </header>
+
+    {
+      isVideo && (
+        <div class="media">
+          <Video id={data.youtube} title={data.title} poster={data.cover} posterAlt={data.coverAlt} />
+        </div>
+      )
+    }
+
+    {
+      toc.length > 2 && (
+        <nav class="toc" aria-label="目录">
+          <h2 class="px">CONTENTS</h2>
+          <ol>
+            {toc.map((h) => (
+              <li class={`depth-${h.depth}`}>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    {
+      data.links.length > 0 && (
+        <section class="refs" aria-labelledby="refs-title">
+          <h2 id="refs-title" class="px">REFERENCES</h2>
+          <ol>
+            {data.links.map((l) => (
+              <li>
+                <a href={l.url}>{l.label}</a>
+                {l.note && <span class="note"> {l.note}</span>}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
+
+    <nav class="pager" aria-label="More posts">
+      {
+        older && (
+          <a href={withBase(postPath(older))}>
+            <span class="dir">&lt; older</span>
+            <span class="t">{older.data.title}</span>
+          </a>
+        )
+      }
+      {
+        newer && (
+          <a class="next" href={withBase(postPath(newer))}>
+            <span class="dir">newer &gt;</span>
+            <span class="t">{newer.data.title}</span>
+          </a>
+        )
+      }
+    </nav>
+  </article>
+</Base>

@@ -1,0 +1,5 @@
+.credentials/
+films.local.json
+uploads.local.jsonl
+.venv/
+__pycache__/

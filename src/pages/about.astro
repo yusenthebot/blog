@@ -1,0 +1,25 @@
+---
+import Base from "../layouts/Base.astro";
+import { SITE } from "../lib/site";
+---
+
+<Base title="About" current="about">
+  <section class="page">
+    <div class="prompt"><span class="user">yusen@blog</span>:~$ <span class="cmd">whoami</span></div>
+    <h1 class="hero-title px">YUSEN XIE</h1>
+    <div class="prose" style="margin:24px 0 0">
+      <p>我研究机器人和 AI，同时制作机器人科普视频。</p>
+      <p>每篇文章讲清楚一项技术：先给出问题的数学表述，再介绍方法和关键论文，最后附上我自己在 Mac 上复现的实验和数据。视频版发布在抖音、TikTok 和 YouTube，文章里的框图都按论文插图的标准重新绘制。</p>
+    </div>
+    <dl class="kv">
+      <dt>home</dt>
+      <dd><a href={SITE.home}>yusenthebot.github.io</a></dd>
+      <dt>github</dt>
+      <dd><a href={SITE.github}>github.com/yusenthebot</a></dd>
+      <dt>id</dt>
+      <dd>yusenthebot · 小红书 / 抖音 / TikTok</dd>
+      <dt>rss</dt>
+      <dd><a href={`${import.meta.env.BASE_URL}rss.xml`}>/blog/rss.xml</a></dd>
+    </dl>
+  </section>
+</Base>

@@ -1,0 +1,37 @@
+---
+import { Image } from "astro:assets";
+import { SERIES, formatDate, withBase } from "../lib/site";
+import { postPath, type Post } from "../lib/posts";
+
+interface Props {
+  post: Post;
+  feature?: boolean;
+}
+
+const { post, feature = false } = Astro.props;
+const { data } = post;
+---
+
+<li class:list={["card", { feature }]} data-series={data.series}>
+  <a href={withBase(postPath(post))}>
+    <div class="thumb">
+      <Image
+        src={data.cover}
+        alt={data.coverAlt}
+        widths={feature ? [640, 960, 1280] : [400, 640, 800]}
+        sizes={feature ? "(max-width: 640px) 100vw, 640px" : "(max-width: 640px) 100vw, (max-width: 960px) 50vw, 380px"}
+        loading={feature ? "eager" : "lazy"}
+      />
+      {data.duration && <span class="badge">{data.duration}</span>}
+    </div>
+    <div>
+      <div class="meta">
+        {data.episode && <span class="ep">EP{String(data.episode).padStart(2, "0")}</span>}
+        <span>{SERIES[data.series].label}</span>
+        <time datetime={data.date.toISOString()}>{formatDate(data.date)}</time>
+      </div>
+      <h2 class="card-title">{data.title}</h2>
+      <p class="card-desc">{data.description}</p>
+    </div>
+  </a>
+</li>

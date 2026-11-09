@@ -1,0 +1,72 @@
+---
+import "@fontsource/jetbrains-mono/400.css";
+import "@fontsource/jetbrains-mono/500.css";
+import "@fontsource/jetbrains-mono/700.css";
+import "@fontsource/vt323/400.css";
+import "../styles/global.css";
+import pixelFont from "../assets/fonts/pixel-12.woff2?url";
+import { SITE, withBase } from "../lib/site";
+
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: "website" | "article";
+  current?: "posts" | "about";
+}
+
+const { title, description = SITE.description, image, type = "website", current } = Astro.props;
+const fullTitle = title ? `${title} | ${SITE.title}` : SITE.title;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = image ? new URL(image, Astro.site).href : undefined;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href={withBase("/favicon.svg")} />
+    <link rel="alternate" type="application/rss+xml" title={SITE.title} href={withBase("/rss.xml")} />
+    <link rel="preload" href={pixelFont} as="font" type="font/woff2" crossorigin />
+    <meta name="theme-color" content="#ffffff" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonical} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="shell">
+        <a class="brand px" href={withBase("/")} aria-label="Blog home">
+          <span class="dot" aria-hidden="true"></span>{SITE.name}<span class="cursor" aria-hidden="true"></span>
+        </a>
+        <nav class="nav" aria-label="Main">
+          <a href={withBase("/")} aria-current={current === "posts" ? "page" : undefined}>posts</a>
+          <a href={withBase("/about/")} aria-current={current === "about" ? "page" : undefined}>about</a>
+          <a href={SITE.home}>~/home</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div class="shell">
+        <slot />
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell">
+        <span>© {new Date().getFullYear()} {SITE.author} · yusenthebot</span>
+        <span>
+          <a href={withBase("/rss.xml")}>rss</a> · <a href={SITE.github}>github</a> · <a href={SITE.home}>yusenthebot.github.io</a>
+        </span>
+      </div>
+    </footer>
+  </body>
+</html>

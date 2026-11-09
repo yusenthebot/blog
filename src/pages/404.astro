@@ -1,0 +1,12 @@
+---
+import Base from "../layouts/Base.astro";
+import { withBase } from "../lib/site";
+---
+
+<Base title="404">
+  <section class="page">
+    <div class="prompt"><span class="user">yusen@blog</span>:~$ <span class="cmd">cd {Astro.url.pathname}</span></div>
+    <h1 class="hero-title px">404</h1>
+    <p class="hero-lede">cd: no such file or directory. <a href={withBase("/")} style="text-decoration:underline">返回文章列表</a></p>
+  </section>
+</Base>

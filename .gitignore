@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+.env
+.env.*
+!.env.example
+tools/youtube/films.local.json
+tools/youtube/.credentials/
+__pycache__/
+.venv/
+src/assets/fonts/*.woff2

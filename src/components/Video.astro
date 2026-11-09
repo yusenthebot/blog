@@ -1,0 +1,55 @@
+---
+// Click-to-load YouTube player: the page ships only the poster image until the
+// reader presses play, then swaps in a privacy-enhanced (nocookie) iframe.
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  id?: string;
+  title: string;
+  poster: ImageMetadata;
+  posterAlt: string;
+}
+
+const { id, title, poster, posterAlt } = Astro.props;
+const embed = id ? `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0` : undefined;
+---
+
+<div class="video" data-embed={embed} data-title={title}>
+  <Image src={poster} alt={posterAlt} widths={[640, 960, 1440]} sizes="(max-width: 960px) 100vw, 896px" loading="eager" />
+  {
+    embed ? (
+      <button type="button" aria-label={`Play video: ${title}`}>
+        <span class="play">
+          <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 1 L13 7 L2 13 Z" fill="currentColor" /></svg>
+          PLAY
+        </span>
+      </button>
+    ) : (
+      <div class="video-status">
+        <span class="blink">●</span> 视频即将上传到YouTube
+      </div>
+    )
+  }
+</div>
+{
+  id && (
+    <p class="media-note">
+      <a href={`https://www.youtube.com/watch?v=${id}`}>在YouTube上观看</a>
+    </p>
+  )
+}
+
+<script>
+  for (const el of document.querySelectorAll<HTMLElement>(".video[data-embed]")) {
+    const button = el.querySelector("button");
+    button?.addEventListener("click", () => {
+      const iframe = document.createElement("iframe");
+      iframe.src = el.dataset.embed ?? "";
+      iframe.title = el.dataset.title ?? "YouTube video";
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      iframe.allowFullscreen = true;
+      el.replaceChildren(iframe);
+    });
+  }
+</script>

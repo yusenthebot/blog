@@ -1,0 +1,76 @@
+---
+import Base from "../layouts/Base.astro";
+import PostCard from "../components/PostCard.astro";
+import { getPosts } from "../lib/posts";
+import { SERIES } from "../lib/site";
+
+const posts = await getPosts();
+const counts = {
+  all: posts.length,
+  kepu: posts.filter((p) => p.data.series === "kepu").length,
+  notes: posts.filter((p) => p.data.series === "notes").length,
+};
+const latest = posts[0]?.data.date.toISOString().slice(5, 10);
+---
+
+<Base current="posts">
+  <section class="hero">
+    <div>
+      <div class="prompt"><span class="user">yusen@blog</span>:~$ <span class="cmd">cat README.md</span></div>
+      <h1 class="hero-title px">YUSEN_BLOG</h1>
+      <div class="hero-lede">
+        <p class="zh px">机器人与 AI，一期讲清一个技术</p>
+        <p>Robotics &amp; AI, explained with the math, the papers, and experiments I ran myself.</p>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b class="px">{counts.all}</b><span>POSTS</span></div>
+      <div class="stat"><b class="px">{counts.kepu}</b><span>VIDEOS</span></div>
+      <div class="stat"><b class="px">{latest}</b><span>UPDATED</span></div>
+    </div>
+  </section>
+
+  <div class="toolbar">
+    <div class="prompt"><span class="user">yusen@blog</span>:~$ <span class="cmd">ls posts/ --sort=date</span></div>
+    <div class="filters" role="group" aria-label="Filter posts">
+      <button class="filter" type="button" data-filter="all" aria-pressed="true">ALL<span class="n">{counts.all}</span></button>
+      <button class="filter" type="button" data-filter="kepu" aria-pressed="false">{SERIES.kepu.label}<span class="n">{counts.kepu}</span></button>
+      <button class="filter" type="button" data-filter="notes" aria-pressed="false">{SERIES.notes.label}<span class="n">{counts.notes}</span></button>
+    </div>
+  </div>
+
+  <ul class="grid">
+    {posts.map((post, i) => <PostCard post={post} feature={i === 0} />)}
+  </ul>
+</Base>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>(".filter");
+  const cards = document.querySelectorAll<HTMLElement>(".card");
+
+  function apply(filter: string) {
+    for (const b of buttons) b.setAttribute("aria-pressed", String(b.dataset.filter === filter));
+    let first = true;
+    for (const c of cards) {
+      const show = filter === "all" || c.dataset.series === filter;
+      c.hidden = !show;
+      // the first visible card is the featured one
+      c.classList.toggle("feature", show && first);
+      if (show) first = false;
+    }
+  }
+
+  for (const b of buttons) {
+    b.addEventListener("click", () => {
+      const filter = b.dataset.filter ?? "all";
+      apply(filter);
+      const url = new URL(location.href);
+      if (filter === "all") url.searchParams.delete("s");
+      else url.searchParams.set("s", filter);
+      history.replaceState(null, "", url);
+    });
+  }
+
+  const initial = new URLSearchParams(location.search).get("s");
+  if (initial === "kepu" || initial === "notes") apply(initial);
+</script>
