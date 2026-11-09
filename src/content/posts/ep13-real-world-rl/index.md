@@ -6,7 +6,7 @@ series: kepu
 episode: 13
 tags: [强化学习, 真机强化学习, 机器人学习, 模仿学习, HIL-SERL]
 cover: ./cover.jpg
-coverAlt: 机械臂拿着插销，对准台面上的方孔
+coverAlt: 两台 Franka 机械臂并排做插销入孔，标题是最前沿的机器人开始自己练了
 duration: "2:53"
 platforms: [douyin, tiktok]
 links:
