@@ -21,7 +21,8 @@ Pushing to `main` deploys to GitHub Pages through `.github/workflows/deploy.yml`
 
 ## Writing a post
 
-See `docs/POST_PLAYBOOK.md`.
+Posts are made with the `yusen-blog` Claude Code skill in `skills/yusen-blog/`: pipeline, writing rules, design notes and the scripts that scaffold a post, cut frames and check posts, links and the live site.
+Install it with `ln -s "$PWD/skills/yusen-blog" ~/.claude/skills/yusen-blog`.
 
 ## Rebuilding a figure
 

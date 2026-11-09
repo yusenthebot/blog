@@ -10,3 +10,4 @@ tools/youtube/.credentials/
 __pycache__/
 .venv/
 src/assets/fonts/*.woff2
+.work/
