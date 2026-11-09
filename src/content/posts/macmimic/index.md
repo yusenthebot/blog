@@ -44,6 +44,8 @@ links:
 
 本文先用公式说明 SuperMimic 的方法，再说明 MacMimic 的系统设计，最后给出仓库中记录的测量数据。方法部分的公式取自论文，符号做了适当简化；数据部分来自 MacMimic 仓库的报告与 `docs/results/` 下的原始记录。
 
+[在作品集中查看 MacMimic](https://yusenthebot.github.io/#project-macmimic)
+
 ## 问题设定与记号
 
 任务是目标条件的部分可观测马尔可夫决策过程。状态 $s_t$ 给出本体感受观测 $o_t$ 与终止标志 $d_t$，目标 $g_t$ 在动作跟踪中读取自参考动作。策略是确定性的，
