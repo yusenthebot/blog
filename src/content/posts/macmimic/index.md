@@ -130,7 +130,7 @@ $$
 
 论文的物理仿真运行在 GPU 的 MuJoCo Warp 上，依赖 CUDA，Apple Silicon 上没有对应的路径。MacMimic 把系统拆成两部分，物理放在 CPU，学习放在 Metal，两者之间只保留一个窄接口。
 
-![MacMimic的运行方式：物理在CPU，学习在Metal，每个控制步交换一次](./fig-pipeline.png "MacMimic在Apple Silicon上的运行方式。(a) 物理在CPU，MuJoCo的C++线程池推进2048个环境。(b) 学习在Metal，状态进回放缓冲，world model拟合后冻结，策略在其中想象32步，梯度经world model传回策略。(c) 一台M5 Max从零训练97.6分钟，40段动作全部完成；同一个256环境基准下，单次迭代从CPU eager的10,567 ms降到272 ms。两端每个控制步只交换一次数据，64 GB统一内存让这次交换只是内存内拷贝，不走PCIe。")
+![MacMimic 的运行方式：物理在 CPU，学习在 Metal，每个控制步交换一次](./fig-pipeline.png "MacMimic 在 Apple Silicon 上的运行方式。(a) 物理在 CPU，MuJoCo 的 C++线程池推进 2048 个环境。(b) 学习在 Metal，状态进回放缓冲，world model 拟合后冻结，策略在其中想象 32 步，梯度经 world model 传回策略。(c) 一台 M5 Max 从零训练 97.6 分钟，40 段动作全部完成；同一个 256 环境基准下，单次迭代从 CPU eager 的 10,567 ms 降到 272 ms。两端每个控制步只交换一次数据，64 GB 统一内存让这次交换只是内存内拷贝，不走 PCIe。")
 
 ### CPU：MuJoCo 的 C++ 线程池
 
