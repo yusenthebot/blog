@@ -128,9 +128,52 @@ const isVideo = data.series === "kepu" || data.video;
 
 <script>
   const toc = document.querySelector<HTMLDetailsElement>(".toc");
-  if (toc) {
+  const nav = toc?.querySelector("nav");
+  const list = nav?.querySelector("ol");
+  if (toc && nav && list) {
     const wide = matchMedia("(min-width: 1200px)");
     toc.open = wide.matches;
     wide.addEventListener("change", ({ matches }) => { toc.open = matches; });
+
+    const sections = Array.from(list.querySelectorAll<HTMLAnchorElement>("a")).flatMap((link) => {
+      const heading = document.getElementById(decodeURIComponent(link.hash.slice(1)));
+      return heading ? [{ link, heading }] : [];
+    });
+    let current: HTMLAnchorElement | undefined;
+    let frame = 0;
+
+    const positionCursor = (link: HTMLAnchorElement) => {
+      list.style.setProperty("--toc-cursor-y", `${link.offsetTop + link.offsetHeight / 2}px`);
+      const { top, bottom } = link.getBoundingClientRect();
+      const bounds = nav.getBoundingClientRect();
+      if (top < bounds.top) nav.scrollTop -= bounds.top - top;
+      else if (bottom > bounds.bottom) nav.scrollTop += bottom - bounds.bottom;
+    };
+
+    const updateSection = () => {
+      frame = 0;
+      let next = sections[0]?.link;
+      for (const { link, heading } of sections) {
+        if (heading.getBoundingClientRect().top > 144) break;
+        next = link;
+      }
+      if (!next || next === current) return;
+      current?.removeAttribute("aria-current");
+      current = next;
+      current.setAttribute("aria-current", "location");
+      if (toc.open) positionCursor(current);
+    };
+
+    function scheduleUpdate() {
+      if (!frame) frame = requestAnimationFrame(updateSection);
+    }
+
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("hashchange", scheduleUpdate);
+    new ResizeObserver(() => {
+      scheduleUpdate();
+      if (toc.open && current) positionCursor(current);
+    }).observe(list);
+    scheduleUpdate();
   }
 </script>

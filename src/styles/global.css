@@ -118,6 +118,30 @@ iframe {
   .cursor { animation: none; }
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition {
+    pointer-events: none;
+  }
+
+  ::view-transition-old(root) {
+    display: none;
+  }
+
+  ::view-transition-group(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+
+  ::view-transition-group(episode) {
+    animation-duration: 200ms;
+    animation-timing-function: cubic-bezier(0.22, 0.7, 0.3, 1);
+  }
+}
+
 /* ---------- Shell ---------- */
 
 .shell {
@@ -577,10 +601,25 @@ iframe {
 .toc summary:focus-visible { outline-offset: -1px; }
 
 .toc ol {
+  position: relative;
   list-style: none;
   margin: 0;
   padding: 0 0 0 12px;
   border-left: 1px solid var(--line-strong);
+}
+
+.toc ol::before {
+  position: absolute;
+  top: -3px;
+  left: -4px;
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  transform: translateY(var(--toc-cursor-y, -8px));
+}
+
+.toc ol:has(a[aria-current="location"])::before {
+  content: "";
 }
 
 .toc li + li {
@@ -588,12 +627,33 @@ iframe {
 }
 
 .toc a {
+  display: block;
   color: var(--muted);
   overflow-wrap: anywhere;
 }
 
-.toc a:hover {
+.toc a:hover,
+.toc a[aria-current="location"] {
   color: var(--text-strong);
+}
+
+.prose :is(h2, h3):target::before {
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .toc ol::before {
+    transition: transform 170ms cubic-bezier(0.22, 0.7, 0.3, 1);
+  }
+
+  .prose :is(h2, h3):target::before {
+    animation: section-arrival 720ms ease-out both;
+  }
+}
+
+@keyframes section-arrival {
+  0%, 35% { color: var(--accent); }
+  100% { color: var(--dim); }
 }
 
 .toc .depth-3 {

@@ -39,6 +39,37 @@ const ogImage = image ? new URL(image, Astro.site).href : undefined;
     <meta property="og:url" content={canonical} />
     {ogImage && <meta property="og:image" content={ogImage} />}
     <meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+    <script is:inline define:vars={{ blogIndex: withBase("/") }}>
+      let episodeLink;
+
+      document.addEventListener("click", (event) => {
+        episodeLink = event.target instanceof Element ? event.target.closest(".card > a") : null;
+      });
+
+      function moveEpisode(transition, badge) {
+        if (!badge) {
+          transition.skipTransition();
+          return;
+        }
+        badge.style.viewTransitionName = "episode";
+        transition.finished.finally(() => { badge.style.viewTransitionName = ""; });
+      }
+
+      window.addEventListener("pageswap", ({ activation, viewTransition }) => {
+        if (!viewTransition) return;
+        const fromCard = activation?.navigationType === "push" && activation.entry?.url === episodeLink?.href;
+        moveEpisode(viewTransition, fromCard ? episodeLink?.querySelector(".ep") : null);
+        episodeLink = null;
+      });
+
+      window.addEventListener("pagereveal", ({ viewTransition }) => {
+        if (!viewTransition) return;
+        const activation = window.navigation?.activation;
+        const fromIndex = activation?.navigationType === "push" && activation.from?.url &&
+          new URL(activation.from.url).pathname === blogIndex;
+        moveEpisode(viewTransition, fromIndex ? document.querySelector(".article-head .ep") : null);
+      });
+    </script>
   </head>
   <body>
     <header class="site-header">
