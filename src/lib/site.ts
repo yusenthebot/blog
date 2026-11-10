@@ -5,6 +5,7 @@ export const SITE = {
   author: "Yusen Xie",
   home: "https://yusenthebot.github.io/",
   github: "https://github.com/yusenthebot",
+  youtube: "https://www.youtube.com/@yusenthebot",
 } as const;
 
 export const SERIES = {

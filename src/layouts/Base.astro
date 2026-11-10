@@ -49,6 +49,7 @@ const ogImage = image ? new URL(image, Astro.site).href : undefined;
         <nav class="nav" aria-label="Main">
           <a href={withBase("/")} aria-current={current === "posts" ? "page" : undefined}>posts</a>
           <a href={withBase("/about/")} aria-current={current === "about" ? "page" : undefined}>about</a>
+          <a href={SITE.youtube}>YouTube</a>
           <a href={SITE.home}>~/home</a>
         </nav>
       </div>

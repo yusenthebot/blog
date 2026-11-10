@@ -1035,6 +1035,19 @@ iframe {
 }
 
 @media (max-width: 520px) {
+  .site-header .shell {
+    gap: 8px;
+  }
+  .brand {
+    gap: 6px;
+    font-size: 22px;
+  }
+  .nav {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    font-size: 12px;
+    line-height: 1.25;
+  }
   .kv {
     grid-template-columns: 1fr;
     gap: 2px;
@@ -1043,7 +1056,7 @@ iframe {
     margin-bottom: 10px;
   }
   .nav a {
-    padding: 6px 7px;
+    padding: 4px;
   }
 }
 
