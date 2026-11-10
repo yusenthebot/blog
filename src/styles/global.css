@@ -491,14 +491,10 @@ iframe {
 /* ---------- Article ---------- */
 
 .article {
+  position: relative;
   display: grid;
-  grid-template-columns: minmax(0, var(--measure)) 13rem;
+  grid-template-columns: minmax(0, var(--measure));
   justify-content: center;
-  gap: 0 56px;
-}
-
-.article > * {
-  grid-column: 1;
 }
 
 .article-head {
@@ -553,27 +549,32 @@ iframe {
 }
 
 .toc {
-  grid-column: 2;
-  grid-row: 1 / span 4;
-  align-self: start;
-  position: sticky;
-  top: 88px;
-  margin-top: 132px;
-  /* A long list scrolls on its own instead of running off the bottom of the window. */
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
+  margin: 14px 0 18px;
+  padding: 4px 9px;
+  border: 1px solid var(--line-strong);
+  border-radius: 3px;
+  background: var(--paper);
   font-size: 12px;
   line-height: 1.6;
 }
 
-.toc h2 {
-  margin: 0 0 10px;
-  font-size: 20px;
-  line-height: 1;
-  color: var(--dim);
+.toc summary {
+  display: list-item;
+  padding: 7px 5px;
+  cursor: pointer;
+  color: var(--text-strong);
 }
+
+.toc summary .px { font-size: 24px; line-height: 1; vertical-align: middle; }
+.toc-count { margin-left: 8px; color: var(--muted); }
+.toc nav {
+  max-height: min(55vh, 32rem);
+  padding: 6px 5px 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.toc summary:focus-visible { outline-offset: -1px; }
 
 .toc ol {
   list-style: none;
@@ -588,6 +589,7 @@ iframe {
 
 .toc a {
   color: var(--muted);
+  overflow-wrap: anywhere;
 }
 
 .toc a:hover {
@@ -598,12 +600,33 @@ iframe {
   padding-left: 12px;
 }
 
-@media (max-width: 1120px) {
-  .article {
-    grid-template-columns: minmax(0, var(--measure));
+@media (min-width: 1200px) {
+  main > .shell:has(> .article) {
+    max-width: none;
   }
+
+  .article {
+    --toc-width: clamp(10rem, 14vw, 13rem);
+  }
+
+  .toc-rail {
+    position: absolute;
+    inset-block: 88px 0;
+    inset-inline-end: 0;
+    width: var(--toc-width);
+  }
+
   .toc {
-    display: none;
+    position: sticky;
+    top: 80px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .toc nav {
+    max-height: calc(100vh - 132px);
   }
 }
 
@@ -777,17 +800,11 @@ iframe {
   counter-increment: fig;
 }
 
-/* Wide figures grow into the empty left margin only: the right side belongs to the sticky
-   contents list. The growth is capped by the margin that is actually free at this width
-   (the article grid is 46rem + 56px + 13rem = 1000px, centred). */
-@media (min-width: 1121px) {
+/* Wide figures use equal space on both sides, with clearance for the contents rail. */
+@media (min-width: 1200px) {
   .prose figure.fig.wide {
-    --grow: clamp(0px, (100vw - 1000px) / 2 - 2 * var(--gutter), 10rem);
-  }
-  .prose figure.fig.wide img {
-    margin-left: calc(-1 * var(--grow));
-    width: calc(100% + var(--grow));
-    max-width: none;
+    --grow: clamp(0px, (100vw - var(--measure)) / 2 - var(--toc-width) - 2 * var(--gutter) - 24px, 5rem);
+    margin-inline: calc(-1 * var(--grow));
   }
 }
 

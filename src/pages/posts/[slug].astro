@@ -68,16 +68,20 @@ const isVideo = data.series === "kepu" || data.video;
 
     {
       toc.length > 2 && (
-        <nav class="toc" aria-label="目录">
-          <h2 class="px">CONTENTS</h2>
-          <ol>
-            {toc.map((h) => (
-              <li class={`depth-${h.depth}`}>
-                <a href={`#${h.slug}`}>{h.text}</a>
-              </li>
-            ))}
-          </ol>
-        </nav>
+        <div class="toc-rail">
+          <details class="toc">
+            <summary><span class="px zh-px">文章目录</span><span class="toc-count">{toc.length} 节</span></summary>
+            <nav aria-label="文章目录">
+              <ol>
+                {toc.map((h) => (
+                  <li class={`depth-${h.depth}`}>
+                    <a href={`#${h.slug}`}>{h.text}</a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          </details>
+        </div>
       )
     }
 
@@ -121,3 +125,12 @@ const isVideo = data.series === "kepu" || data.video;
     </nav>
   </article>
 </Base>
+
+<script>
+  const toc = document.querySelector<HTMLDetailsElement>(".toc");
+  if (toc) {
+    const wide = matchMedia("(min-width: 1200px)");
+    toc.open = wide.matches;
+    wide.addEventListener("change", ({ matches }) => { toc.open = matches; });
+  }
+</script>
