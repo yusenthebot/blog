@@ -1,5 +1,6 @@
 ---
 title: 被推了一把：倒立摆、capture point 与步态时钟奖励
+youtubeTitle: "人形机器人被推一把为什么不倒，双足强化学习。"
 description: 从线性倒立摆推导 capture point，讨论 Siekmann 等人的周期性奖励，并给出我们在 Unitree G1 上用 PPO 加步态时钟的实验：落脚位置与 capture point 的相关性，以及有无时钟的步态对比。
 date: 2026-11-04
 series: kepu
@@ -8,7 +9,8 @@ tags: [双足机器人, UnitreeG1, 强化学习, CapturePoint, 步态时钟, 全
 cover: ./cover.jpg
 coverAlt: G1 被推了一把，脚落进地上橙色的 capture point 圈
 duration: "2:02"
-platforms: [douyin, tiktok]
+youtube: DSuFX6J6sQ0
+platforms: [douyin, tiktok, youtube]
 links:
   - label: "Pratt et al. (2006). Capture Point: A Step toward Humanoid Push Recovery."
     url: http://www.ambarish.com/paper/Pratt_Goswami_Humanoids2006.pdf

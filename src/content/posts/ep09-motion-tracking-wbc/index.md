@@ -1,5 +1,6 @@
 ---
 title: 照着人跳：动作跟踪全身控制，SONIC 的规模与 SuperMimic 的世界模型梯度
+youtubeTitle: "人形机器人照着人跳舞，最前沿的动作跟踪全身控制。"
 description: 介绍人形机器人 motion tracking 的奖励设计与两条路线，即 NVIDIA SONIC 的大规模统一跟踪器和 SuperMimic 通过可微世界模型反向传播回报，并给出我们在 Mac 上运行 SONIC 以及用一条 G1 手臂做的缩小版对比实验。
 date: 2026-11-05
 series: kepu
@@ -8,7 +9,8 @@ tags: [人形机器人, UnitreeG1, MotionTracking, WholeBodyControl, SONIC, Supe
 cover: ./cover.jpg
 coverAlt: G1 在跳 macarena，青色半透明的是参考动作
 duration: "2:19"
-platforms: [douyin, tiktok]
+youtube: WC9tVgKZNWk
+platforms: [douyin, tiktok, youtube]
 links:
   - label: "Luo et al. (2025). SONIC: Supersizing Motion Tracking for Natural Humanoid Whole-Body Control."
     url: https://arxiv.org/abs/2511.07820

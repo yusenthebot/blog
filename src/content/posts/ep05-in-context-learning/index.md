@@ -1,5 +1,6 @@
 ---
 title: 电机接反了：上下文学习，不改权重也能当场学会
+youtubeTitle: "不改权重也能当场学会，机器人的上下文学习。"
 description: 上下文学习（In-Context Learning，ICL）让模型仅凭输入中的示例或历史适应新任务，权重保持不变。本文给出 ICL 的形式化，复现 transformer 在线性回归上的上下文学习，并用一个电机接线被随机交换的 UR5e 仿真实验说明机器人如何利用历史。
 date: 2026-10-31
 series: kepu
@@ -8,7 +9,8 @@ tags: [上下文学习, InContextLearning, Transformer, 具身智能, SkildAI]
 cover: ./cover.jpg
 coverAlt: 两台UR5e机械臂并排，标题是“电机接反了，它怎么自己发现的？”
 duration: "2:18"
-platforms: [douyin, tiktok]
+youtube: Ruw3U7ZRjvg
+platforms: [douyin, tiktok, youtube]
 links:
   - label: "Brown et al. (2020). Language Models are Few-Shot Learners (GPT-3)."
     url: https://arxiv.org/abs/2005.14165

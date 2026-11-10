@@ -1,5 +1,6 @@
 ---
 title: 没人教它走路：用 PPO 训练四足机器人的步态
+youtubeTitle: "没人教，四足机器人怎么自己学会走路，强化学习。"
 description: 从 MDP、策略梯度、GAE 与 PPO 的裁剪目标，到非对称 actor-critic 和域随机化，再到 Rudin 等人的大规模并行训练，并给出我们在 Mac CPU 上用 4096 只 Go2 完成的实验。
 date: 2026-11-03
 series: kepu
@@ -8,7 +9,8 @@ tags: [强化学习, PPO, 四足机器人, Go2, SimToReal]
 cover: ./cover.jpg
 coverAlt: 一大片 Go2 机器狗在仿真地面上，标题是没人教过它们走路
 duration: "2:24"
-platforms: [douyin, tiktok]
+youtube: UJRgCW5_9Hk
+platforms: [douyin, tiktok, youtube]
 links:
   - label: "Schulman et al. (2017). Proximal Policy Optimization Algorithms."
     url: https://arxiv.org/abs/1707.06347

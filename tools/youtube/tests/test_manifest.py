@@ -75,3 +75,12 @@ def test_write_video_id_keeps_body_and_lines(tmp_path):
 def test_rejects_bad_id(tmp_path):
     with pytest.raises(ManifestError):
         write_video_id(make_post(tmp_path), "short")
+
+
+def test_youtube_title_overrides_and_drops_episode_suffix(tmp_path: Path) -> None:
+    text = POST.replace("episode: 1\n", 'episode: 1\nyoutubeTitle: "阿波罗登月背后的算法，扩展卡尔曼滤波。"\n')
+    assert build_title(read_post(make_post(tmp_path, text=text))) == "阿波罗登月背后的算法，扩展卡尔曼滤波。"
+
+
+def test_title_falls_back_to_post_title_with_episode(tmp_path: Path) -> None:
+    assert build_title(read_post(make_post(tmp_path))).endswith(" | EP01")

@@ -76,12 +76,17 @@ def _clean(s: str) -> str:
 
 
 def build_title(post: Post) -> str:
-    title = _clean(str(post.data.get("title", "")))
-    if not title:
-        raise ManifestError(f"{post.slug}: empty title")
-    ep = post.data.get("episode")
-    if ep:
-        title = f"{title} | EP{int(ep):02d}"
+    """`youtubeTitle` when the post has one (written as is), else `title | EPnn`."""
+    custom = _clean(str(post.data.get("youtubeTitle", "") or ""))
+    if custom:
+        title = custom
+    else:
+        title = _clean(str(post.data.get("title", "")))
+        if not title:
+            raise ManifestError(f"{post.slug}: empty title")
+        ep = post.data.get("episode")
+        if ep:
+            title = f"{title} | EP{int(ep):02d}"
     if len(title) > TITLE_MAX:
         raise ManifestError(f"{post.slug}: title is {len(title)} chars, YouTube allows {TITLE_MAX}")
     return title
@@ -142,6 +147,11 @@ def pending_jobs(posts: list[Post], films: dict[str, Path], only: set[str] | Non
             continue
         jobs.append(build_job(post, film))
     return jobs
+
+
+def uploaded_posts(posts: list[Post], only: set[str] | None = None) -> list[Post]:
+    """Posts that already carry a `youtube` id; `only` narrows to some slugs."""
+    return [p for p in posts if p.data.get("youtube") and (only is None or p.slug in only)]
 
 
 def write_video_id(index_md: Path, video_id: str) -> None:

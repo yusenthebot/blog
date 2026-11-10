@@ -1,5 +1,6 @@
 ---
 title: 200次观星：扩展卡尔曼滤波怎样把人送上月球
+youtubeTitle: "阿波罗登月背后的算法，扩展卡尔曼滤波。"
 description: 从状态模型、测量模型和雅可比矩阵出发，推导扩展卡尔曼滤波（EKF）的预测与更新公式，并以 Apollo 8 的六分仪观星为例说明这套方法在奔月途中如何工作。
 date: 2026-10-27
 series: kepu
@@ -8,7 +9,8 @@ tags: [卡尔曼滤波, EKF, 阿波罗, 状态估计, 机器人]
 cover: ./cover.jpg
 coverAlt: 土星五号载着Apollo 8升空的渲染画面
 duration: "1:33"
-platforms: [douyin, tiktok]
+youtube: F4b4kfJQk78
+platforms: [douyin, tiktok, youtube]
 links:
   - label: "Kalman (1960). A New Approach to Linear Filtering and Prediction Problems."
     url: https://doi.org/10.1115/1.3662552

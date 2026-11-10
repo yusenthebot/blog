@@ -1,5 +1,6 @@
 ---
 title: 越走越偏：模仿学习，示范太完美反而学不会自救
+youtubeTitle: "一条视频看懂现在机器人 foundation model 的本质，模仿学习。"
 description: 行为克隆为什么会一步错、步步错？本文从 Ross 等人的 O(T^2 ε) 误差界出发，推导 DAgger、DART 噪声注入、action chunking 与扩散策略各自修复了什么，并用我们的两个二维仿真实验给出对照数据。
 date: 2026-11-03
 series: kepu
@@ -8,7 +9,8 @@ tags: [模仿学习, 行为克隆, DAgger, 扩散策略, 机器人学习]
 cover: ./cover.jpg
 coverAlt: 两台机械臂沿弯道摆着小立柱的车道行走，左边只学了完美示范，右边补过一轮标注
 duration: "2:12"
-platforms: [douyin, tiktok]
+youtube: aZOR7i4kd2U
+platforms: [douyin, tiktok, youtube]
 links:
   - label: "Ross, Gordon & Bagnell (2011). A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning (DAgger)."
     url: https://arxiv.org/abs/1011.0686

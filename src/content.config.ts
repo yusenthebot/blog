@@ -17,6 +17,8 @@ const posts = defineCollection({
       coverAlt: z.string(),
       // YouTube video id (not the URL). Empty until the video is uploaded.
       youtube: z.string().regex(/^[A-Za-z0-9_-]{11}$/).optional(),
+      // Title used on YouTube only, in the X post style; the page keeps `title`.
+      youtubeTitle: z.string().max(100).optional(),
       duration: z.string().optional(),
       // notes posts that come with a film (kepu posts always show the player)
       video: z.boolean().default(false),

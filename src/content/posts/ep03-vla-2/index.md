@@ -1,5 +1,6 @@
 ---
 title: 从烘干机里拿衣服：VLA下，一次画出一段动作
+youtubeTitle: "机器人怎么一次画出一整段动作，VLA 下篇。"
 description: 逐个动作自回归输出的 VLA 难以完成折叠衣物这类高频精细操作。本文介绍动作分块（ACT）、π0 的 VLM 加 action expert 结构与条件 flow matching 的训练和采样，并概述 π0.5 与 π*0.6。
 date: 2026-10-29
 series: kepu
@@ -8,7 +9,8 @@ tags: [VLA, 流匹配, PhysicalIntelligence, 具身智能, 机器人]
 cover: ./cover.jpg
 coverAlt: 桌边的UR5e机械臂，橙色点列标出接下来的一段动作
 duration: "2:04"
-platforms: [douyin, tiktok]
+youtube: qwXIyTkjyTE
+platforms: [douyin, tiktok, youtube]
 links:
   - label: "Ross et al. (2011). A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning."
     url: https://arxiv.org/abs/1011.0686

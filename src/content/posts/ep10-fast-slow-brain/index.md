@@ -1,5 +1,6 @@
 ---
 title: 分层具身系统：从一句话到关节力矩的控制频率层级
+youtubeTitle: "机器人大脑最前沿的设计思路，快慢脑。"
 description: 视觉语言模型生成一次回答需要一到两秒，而人形机器人的平衡需要以百赫兹计的闭环。本文推导分层系统各层频率与接口的约束，梳理 Helix、GR00T N1、π0.5 的分层方式，并在一台 Mac 上搭建三层系统，测量推力扰动与关节目标刷新率的影响。
 date: 2026-11-06
 series: kepu
@@ -8,7 +9,8 @@ tags: [快慢脑, 具身智能, 人形机器人, VLA, SONIC]
 cover: ./cover.jpg
 coverAlt: 人形机器人被侧面推了一把，右上角是三层系统的刷新频率
 duration: "1:50"
-platforms: [douyin, tiktok]
+youtube: xWrIDe1sssQ
+platforms: [douyin, tiktok, youtube]
 links:
   - label: "Figure AI (2025). Helix: A Vision-Language-Action Model for Generalist Humanoid Control."
     url: https://www.figure.ai/news/helix

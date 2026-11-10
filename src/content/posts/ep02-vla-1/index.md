@@ -1,5 +1,6 @@
 ---
 title: 捡起灭绝的动物：VLA上，大模型怎样学会动手
+youtubeTitle: "大模型是怎么学会动手的，VLA 上篇。"
 description: 视觉-语言-动作模型（VLA）把图像、指令和机器人动作统一为 token 序列。本文以 RT-1、RT-2 和 OpenVLA 为线索，说明动作离散化、自回归解码和与网络数据联合微调的做法。
 date: 2026-10-29
 series: kepu
@@ -8,7 +9,8 @@ tags: [VLA, RT-2, 大模型, 具身智能, 机器人]
 cover: ./cover.jpg
 coverAlt: 机械臂夹住桌上的绿色恐龙玩具
 duration: "1:42"
-platforms: [douyin, tiktok]
+youtube: NclbVIej9ik
+platforms: [douyin, tiktok, youtube]
 links:
   - label: "Brohan et al. (2022). RT-1: Robotics Transformer for Real-World Control at Scale."
     url: https://arxiv.org/abs/2212.06817

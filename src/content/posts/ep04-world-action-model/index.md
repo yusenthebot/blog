@@ -1,5 +1,6 @@
 ---
 title: 动手前先做梦：世界动作模型，让机器人先想好画面再动手
+youtubeTitle: "机器人动手前先做梦，最前沿的世界动作模型。"
 description: 世界动作模型（World Action Model，WAM）在同一个视频扩散模型中联合预测未来画面与机器人动作。本文从世界模型的形式化出发，介绍视频预测、级联式的 UniPi 与联合式的 DreamZero，并给出 flow matching 目标函数。
 date: 2026-10-30
 series: kepu
@@ -8,7 +9,8 @@ tags: [世界模型, WorldActionModel, DreamZero, 具身智能, 机器人学习]
 cover: ./cover.jpg
 coverAlt: 一排正在从噪声里去噪生成的视频帧，上方是标题“机器人动手之前，先在脑子里放一段视频？”
 duration: "2:06"
-platforms: [douyin, tiktok]
+youtube: 9f5JJdIyDvk
+platforms: [douyin, tiktok, youtube]
 links:
   - label: "Ye et al. (2026). World Action Models are Zero-shot Policies (DreamZero)."
     url: https://arxiv.org/abs/2602.15922

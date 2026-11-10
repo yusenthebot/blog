@@ -16,7 +16,18 @@ import time
 from datetime import UTC, datetime
 from pathlib import Path
 
-from .manifest import ManifestError, UploadJob, load_film_map, load_posts, pending_jobs, write_video_id
+from .manifest import (
+    ManifestError,
+    UploadJob,
+    build_description,
+    build_tags,
+    build_title,
+    load_film_map,
+    load_posts,
+    pending_jobs,
+    uploaded_posts,
+    write_video_id,
+)
 
 log = logging.getLogger("yt_upload")
 
@@ -27,7 +38,9 @@ CRED_DIR = TOOL_DIR / ".credentials"
 FILM_MAP = TOOL_DIR / "films.local.json"
 UPLOAD_LOG = TOOL_DIR / "uploads.local.jsonl"
 
-SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+# Full `youtube` scope: upload, name the target channel before sending, and edit
+# titles and privacy of videos already uploaded (`sync`).
+SCOPES = ["https://www.googleapis.com/auth/youtube"]
 CHUNK = 8 * 1024 * 1024
 RETRY_STATUS = {500, 502, 503, 504}
 MAX_RETRIES = 8
@@ -41,7 +54,9 @@ def _credentials(client_secret: Path, token: Path):
 
     creds = None
     if token.exists():
-        creds = Credentials.from_authorized_user_file(str(token), SCOPES)
+        creds = Credentials.from_authorized_user_file(str(token))
+        if not creds.has_scopes(SCOPES):
+            creds = None  # token predates a scope change; ask for consent again
     if creds and creds.valid:
         return creds
     if creds and creds.expired and creds.refresh_token:
@@ -66,6 +81,19 @@ def _service(args):
 
     creds = _credentials(args.client_secret, args.token)
     return build("youtube", "v3", credentials=creds, cache_discovery=False)
+
+
+def _channel_line(youtube) -> str:
+    items = youtube.channels().list(part="id,snippet", mine=True).execute().get("items", [])
+    if not items:
+        raise SystemExit("The authorized Google account has no YouTube channel.")
+    ch = items[0]
+    parts = [
+        ch["snippet"]["title"],
+        ch["snippet"].get("customUrl"),
+        f"https://www.youtube.com/channel/{ch['id']}",
+    ]
+    return " ".join(p for p in parts if p)
 
 
 def _body(job: UploadJob, privacy: str) -> dict:
@@ -171,8 +199,9 @@ def cmd_plan(args) -> int:
 
 
 def cmd_auth(args) -> int:
-    _credentials(args.client_secret, args.token)
+    youtube = _service(args)
     print(f"Authorized. Token saved to {args.token}")
+    print(f"Channel: {_channel_line(youtube)}")
     return 0
 
 
@@ -181,13 +210,14 @@ def cmd_upload(args) -> int:
     if not jobs:
         print("Nothing to upload.")
         return 0
+    youtube = _service(args)
+    print(f"Channel: {_channel_line(youtube)}")
     print(f"{len(jobs)} film(s) will be uploaded as {args.privacy}:")
     for j in jobs:
         print(f"  - {j.slug}: {j.title}")
     if not args.yes and input("Proceed? [y/N] ").strip().lower() != "y":
         print("Cancelled.")
         return 1
-    youtube = _service(args)
     for j in jobs:
         log.info("uploading %s", j.slug)
         video_id = _upload_one(youtube, j, args.privacy)
@@ -211,6 +241,61 @@ def cmd_upload(args) -> int:
     return 0
 
 
+def cmd_sync(args) -> int:
+    """Push each uploaded post's title, description and tags to YouTube, optionally its privacy."""
+    posts = uploaded_posts(load_posts(POSTS_DIR), set(args.only) if args.only else None)
+    if not posts:
+        print("No uploaded posts to sync.")
+        return 0
+    youtube = _service(args)
+    print(f"Channel: {_channel_line(youtube)}")
+    by_id = {str(p.data["youtube"]): p for p in posts}
+    items = youtube.videos().list(part="snippet,status", id=",".join(by_id)).execute().get("items", [])
+    missing = set(by_id) - {v["id"] for v in items}
+    if missing:
+        raise SystemExit(f"Not found on this channel: {', '.join(sorted(missing))}")
+    changes = []
+    for v in items:
+        post = by_id[v["id"]]
+        snippet = dict(v["snippet"])
+        snippet.update(
+            title=build_title(post), description=build_description(post), tags=list(build_tags(post))
+        )
+        status = dict(v["status"])
+        if args.privacy:
+            status["privacyStatus"] = args.privacy
+        changes.append((post.slug, v, snippet, status))
+        print(
+            f"  {post.slug}: {v['snippet']['title']!r} -> {snippet['title']!r}, "
+            f"{v['status']['privacyStatus']} -> {status['privacyStatus']}"
+        )
+    if not args.yes and input("Apply? [y/N] ").strip().lower() != "y":
+        print("Cancelled.")
+        return 1
+    for slug, v, snippet, status in changes:
+        keep = ("title", "description", "tags", "categoryId", "defaultLanguage", "defaultAudioLanguage")
+        # videos.update replaces the whole status part: restate the AI-voice disclosure and the
+        # audience flag every time, or they fall back to YouTube's defaults.
+        body_status = {
+            "privacyStatus": status["privacyStatus"],
+            "selfDeclaredMadeForKids": False,
+            "containsSyntheticMedia": True,
+        }
+        body_status.update(
+            {k: status[k] for k in ("embeddable", "license", "publicStatsViewable") if k in status}
+        )
+        youtube.videos().update(
+            part="snippet,status",
+            body={
+                "id": v["id"],
+                "snippet": {k: snippet[k] for k in keep if k in snippet},
+                "status": body_status,
+            },
+        ).execute()
+        print(f"  {slug} updated: https://youtu.be/{v['id']}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     p = argparse.ArgumentParser(
@@ -220,7 +305,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--client-secret", type=Path, default=CRED_DIR / "client_secret.json")
     p.add_argument("--token", type=Path, default=CRED_DIR / "token.json")
     sub = p.add_subparsers(dest="cmd", required=True)
-    for name in ("plan", "upload"):
+    for name in ("plan", "upload", "sync"):
         s = sub.add_parser(name)
         s.add_argument("--only", nargs="+", metavar="SLUG", help="limit to these posts")
     sub.add_parser("auth")
@@ -228,9 +313,12 @@ def main(argv: list[str] | None = None) -> int:
     up.add_argument("--privacy", choices=("private", "unlisted", "public"), default="private")
     up.add_argument("--thumbnail", action="store_true", help="also set cover.jpg as the thumbnail")
     up.add_argument("--yes", action="store_true", help="skip the confirmation prompt")
+    sy = sub.choices["sync"]
+    sy.add_argument("--privacy", choices=("private", "unlisted", "public"), help="also set privacy")
+    sy.add_argument("--yes", action="store_true", help="skip the confirmation prompt")
     args = p.parse_args(argv)
     try:
-        return {"plan": cmd_plan, "auth": cmd_auth, "upload": cmd_upload}[args.cmd](args)
+        return {"plan": cmd_plan, "auth": cmd_auth, "upload": cmd_upload, "sync": cmd_sync}[args.cmd](args)
     except ManifestError as e:
         print(f"error: {e}", file=sys.stderr)
         return 2

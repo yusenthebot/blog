@@ -31,5 +31,7 @@ After uploading, rebuild and deploy the blog so the players appear.
 ## Limits worth knowing
 
 - Uploads use their own quota bucket: 1 unit per upload, 100 uploads a day by default (YouTube Data API docs, checked 2026-11-09).
+- The channel has its own daily cap on top of that: a channel that is not phone-verified stopped at 10 uploads on 2026-11-10 with `uploadLimitExceeded`. Rerun the next day; finished posts are skipped.
+- Behind an HTTP proxy (`HTTPS_PROXY`), the Google client needs PySocks, which is a dependency for that reason.
 - Custom thumbnails (`--thumbnail`) need a phone-verified channel; without it the upload still succeeds and YouTube picks a frame.
 - Default privacy is `private`; switch videos to public in YouTube Studio, or rerun with `--privacy public` for new uploads.
