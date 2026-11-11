@@ -9,7 +9,8 @@ tags: [触觉, 力控制, 阻抗控制, 具身智能, 机器人学习]
 cover: ./cover.jpg
 coverAlt: 机械手夹着鸡蛋，旁边是两块指垫的触觉图像
 duration: "2:27"
-platforms: [douyin, tiktok]
+youtube: LH8pri6u5Xc
+platforms: [douyin, tiktok, youtube]
 links:
   - label: "Lambeta et al. (2020). DIGIT: A Novel Design for a Low-Cost Compact High-Resolution Tactile Sensor with Application to In-Hand Manipulation."
     url: https://arxiv.org/abs/2005.14679

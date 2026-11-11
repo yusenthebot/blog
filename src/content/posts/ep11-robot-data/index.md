@@ -9,7 +9,8 @@ tags: [机器人数据, 遥操作, 具身智能, 人形机器人, 机器人学�
 cover: ./cover.jpg
 coverAlt: 桌上的一副Aria眼镜，右上角是数据三角
 duration: "3:27"
-platforms: [douyin, tiktok]
+youtube: g4wlg7xGes4
+platforms: [douyin, tiktok, youtube]
 links:
   - label: "Ross et al. (2011). A Reduction of Imitation Learning and Structured Prediction to No-Regret Online Learning."
     url: https://arxiv.org/abs/1011.0686

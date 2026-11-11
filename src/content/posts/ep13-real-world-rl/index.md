@@ -2,13 +2,11 @@
 title: 真机强化学习：从 QT-Opt 到 HIL-SERL 与奖励判别器
 description: 模仿学习的上限由示范决定，强化学习只依赖奖励信号，因而可能超越示范，但真机训练的代价和奖励判别器的误差是主要障碍。本文介绍离策略 actor-critic、QT-Opt、HIL-SERL 与大模型上的强化学习，并用 MuJoCo 插销入孔实验给出对比。
 date: 2026-11-09
-series: kepu
-episode: 13
+series: notes
 tags: [强化学习, 真机强化学习, 机器人学习, 模仿学习, HIL-SERL]
 cover: ./cover.jpg
 coverAlt: 两台 Franka 机械臂并排做插销入孔，标题是最前沿的机器人开始自己练了
-duration: "2:53"
-platforms: [douyin, tiktok]
+platforms: []
 links:
   - label: "Kalashnikov et al. (2018). QT-Opt: Scalable Deep Reinforcement Learning for Vision-Based Robotic Manipulation."
     url: https://arxiv.org/abs/1806.10293
