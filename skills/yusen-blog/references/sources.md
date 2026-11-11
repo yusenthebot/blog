@@ -26,7 +26,7 @@ Since EP13 the folders also hold:
 - `成片/旧版_*` folders: old cuts, never use them.
 
 Episode numbers changed on 2026-11-10: the old EP13 (真机强化学习) was shelved to be redone and never published as a video, EP13 is now 机器人打球 and EP14 is 视觉编码器.
-The blog still has `ep13-real-world-rl` from the old numbering; check with the user before adding a new `ep13-*` post (two posts would carry `episode: 13`).
+On the blog the old article stays at `ep13-real-world-rl` as a notes post without an episode number (2026-11-11); `ep13-table-tennis` and `ep14-vision-encoder` are the posts for the new episodes. A slug's number is history, the `episode` field is the truth.
 The same episodes are also in the `kepu-video` skill's examples (`~/Developer/kepu-video-skill/`), which hold copies of the storylines, specs and post copy.
 New episodes are made with the `kepu-video` skill; when an episode is finished there, its blog post is the next step here.
 

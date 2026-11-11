@@ -7,6 +7,8 @@
 //   overflow    a headline wider than its box
 // One width per call keeps each call under the tool's time limit:
 //   await layoutCheck(375)   then 1000, 1199, 1200, 1440, 1920
+// On the dev server, load this file without pasting it:
+//   (0, eval)((await import("/blog/@fs/<absolute path of this file>?raw")).default)
 // (1199 and 1200 are the two sides of the breakpoint where the contents list becomes a rail.)
 // A clean run returns { width, pages, count: 0, problems: [] }. The same problems at every width
 // mean the check itself is broken, not the site.

@@ -28,7 +28,8 @@ One accent only; no gradients, glows, scanlines or shadows.
 
 The live layout is the one on `origin/main`; this section was checked against it on 2026-11-11.
 
-- Home: hero (prompt line, `YUSEN_BLOG`, pixel tagline, English lede, POSTS / VIDEOS / UPDATED stats), filter buttons (all, 科普视频, 图文; synced to `?s=`), then a card grid of 3 columns (2 below 960 px, 1 below 640 px). The first visible card is a full-width feature card.
+- Home: hero (prompt line, `YUSEN_BLOG`, the pixel tagline 献给我最热爱的 Robotics and Artificial Intelligence, English lede, one line of counts) beside a 从这里开始 reading guide of three hand-picked posts (`readingGuide` in `index.astro`); then 文章索引 with a search box (title, description, tags, episode; synced to `?q=`) and filter buttons (全部, 科普视频, 图文; synced to `?s=`), a live count, an empty state, and a card grid of 3 columns (2 below 960 px, 1 below 640 px). The first visible card is a full-width feature card.
+- Post pages link each tag to the index filtered by it (`/?q=tag#posts`) and end with 同主题继续读: up to two posts sharing the most tags, excluding the pager's neighbours.
 - Post: title, lede, meta and tags; the video block (click-to-load youtube-nocookie player, or the "即将上传到 YouTube" placeholder when the post has no id); the article; a numbered REFERENCES list; prev/next pager.
 - The article column (46 rem) is centred on the page at every width. The contents list no longer takes a grid column:
   - From 1200 px up it is a rail docked to the right edge of the page (`.toc-rail`, absolutely positioned, `clamp(10rem, 14vw, 13rem)` wide) with the list sticky inside it and scrolling on its own when taller than the window.
