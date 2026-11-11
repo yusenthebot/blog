@@ -36,7 +36,7 @@ The build subsets the pixel font to the characters the site uses (`scripts/subse
 
 The channel is https://www.youtube.com/@yusenthebot, linked from the header and the About page.
 The uploader is `tools/youtube` (uv project `yt-upload`); its README has the one-time Google Cloud setup, which is done: the OAuth client and token are in `tools/youtube/.credentials/` (git-ignored; never read, print or copy them).
-State on 2026-11-11: EP01 to EP12 are public; EP13 and EP14 are uploaded as unlisted (the blog player works, the channel does not list them) until the user makes them public; the notes posts have no film (MacMimic's is excluded).
+State on 2026-11-11: EP01 to EP14 are uploaded and public; the notes posts have no film (MacMimic's is excluded).
 A private video cannot play in the blog's player, so upload as unlisted when the post is going live and public is not yet approved.
 
 For a post:
