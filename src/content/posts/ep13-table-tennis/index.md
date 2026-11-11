@@ -8,7 +8,8 @@ tags: [乒乓球机器人, 轨迹预测, 马格努斯效应, 扩展卡尔曼滤�
 cover: ./cover.jpg
 coverAlt: 昏暗的球馆里，一台装在滑轨上的 Panda 机械臂握着球拍站在乒乓球台一端，远处有一个来球
 duration: "3:08"
-platforms: [douyin, tiktok]
+youtube: 9Pb_hcXO19o
+platforms: [douyin, tiktok, youtube]
 youtubeTitle: "乒乓球飞过整张球台只要零点二秒，机器人怎么接得住，高速击球。"
 links:
   - label: "Dürr et al. (2026). Outplaying elite table tennis players with an autonomous robot."

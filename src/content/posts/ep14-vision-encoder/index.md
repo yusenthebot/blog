@@ -9,7 +9,8 @@ tags: [机器人视觉, DINOv2, 自监督学习, ViT, 具身智能, MuJoCo]
 cover: ./cover.jpg
 coverAlt: 我们的仿真桌面经 DINOv2 特征主成分着色后的样子，两只杯子、苹果、酒瓶和纸箱各呈一种颜色
 duration: "2:54"
-platforms: [douyin, tiktok]
+youtube: TUmOEt2zDeU
+platforms: [douyin, tiktok, youtube]
 links:
   - label: "Dosovitskiy et al. (2021). An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale."
     url: https://arxiv.org/abs/2010.11929
