@@ -11,9 +11,11 @@ interface Props {
 
 const { post, feature = false } = Astro.props;
 const { data } = post;
+const episode = data.episode ? `EP${String(data.episode).padStart(2, "0")}` : "";
+const searchText = [data.title, data.description, ...data.tags, episode, post.id].join(" ");
 ---
 
-<li class:list={["card", { feature }]} data-series={data.series}>
+<li class:list={["card", { feature }]} data-series={data.series} data-search={searchText}>
   <a href={withBase(postPath(post))}>
     <div class="thumb">
       <Image
@@ -27,7 +29,7 @@ const { data } = post;
     </div>
     <div>
       <div class="meta">
-        {data.episode && <span class="ep">EP{String(data.episode).padStart(2, "0")}</span>}
+        {episode && <span class="ep">{episode}</span>}
         <span>{SERIES[data.series].label}</span>
         <time datetime={data.date.toISOString()}>{formatDate(data.date)}</time>
       </div>

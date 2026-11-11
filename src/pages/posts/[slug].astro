@@ -13,7 +13,20 @@ export async function getStaticPaths() {
   return posts.map((post, i) => ({
     params: { slug: post.id },
     // posts are newest first: "newer" is the previous one in the list
-    props: { post, newer: posts[i - 1], older: posts[i + 1] },
+    props: {
+      post,
+      newer: posts[i - 1],
+      older: posts[i + 1],
+      related: posts
+        .filter((candidate) => candidate !== post && candidate !== posts[i - 1] && candidate !== posts[i + 1])
+        .map((candidate) => ({
+          post: candidate,
+          tags: candidate.data.tags.filter((tag) => post.data.tags.includes(tag)),
+        }))
+        .filter(({ tags }) => tags.length > 0)
+        .sort((a, b) => b.tags.length - a.tags.length)
+        .slice(0, 2),
+    },
   }));
 }
 
@@ -21,9 +34,10 @@ interface Props {
   post: Post;
   newer?: Post;
   older?: Post;
+  related: { post: Post; tags: string[] }[];
 }
 
-const { post, newer, older } = Astro.props;
+const { post, newer, older, related } = Astro.props;
 const { data } = post;
 const { Content, headings } = await render(post);
 const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
@@ -51,7 +65,7 @@ const isVideo = data.series === "kepu" || data.video;
         data.tags.length > 0 && (
           <div class="tags">
             {data.tags.map((t) => (
-              <span class="tag">#{t}</span>
+              <a class="tag" href={withBase(`/?q=${encodeURIComponent(t)}#posts`)}>#{t}</a>
             ))}
           </div>
         )
@@ -105,11 +119,27 @@ const isVideo = data.series === "kepu" || data.video;
       )
     }
 
-    <nav class="pager" aria-label="More posts">
+    {related.length > 0 && (
+      <section class="related-reading" aria-labelledby="related-title">
+        <h2 class="px zh-px" id="related-title">同主题继续读</h2>
+        <ul>
+          {related.map(({ post: nextPost, tags }) => (
+            <li>
+              <a href={withBase(postPath(nextPost))}>
+                <span class="related-topics">{tags.slice(0, 2).join(" · ")}</span>
+                <span>{nextPost.data.title}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <nav class="pager" aria-label="按时间继续阅读">
       {
         older && (
           <a href={withBase(postPath(older))}>
-            <span class="dir">&lt; older</span>
+            <span class="dir">← 较早发布</span>
             <span class="t" set:html={wbrHtml(older.data.title)} />
           </a>
         )
@@ -117,7 +147,7 @@ const isVideo = data.series === "kepu" || data.video;
       {
         newer && (
           <a class="next" href={withBase(postPath(newer))}>
-            <span class="dir">newer &gt;</span>
+            <span class="dir">较新发布 →</span>
             <span class="t" set:html={wbrHtml(newer.data.title)} />
           </a>
         )
