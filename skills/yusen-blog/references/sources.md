@@ -17,6 +17,16 @@ Set `LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8` before shell commands on these paths a
 | `策划/` | Research notes, `事实核查.md`, paper lists, experiment code and `实验/结果.md` with the real numbers and their conditions |
 
 EP03's `策划` is a link to EP02's.
+`~/Desktop/科普视频` is a broken link (it points at a folder named `科普视频`, the real one is `科普视频 2`): use the full path.
+
+Since EP13 the folders also hold:
+
+- `发布文案.md` with a `## 封面大字` section before `## 标题`, and a title of the form `outsider line｜technical line` (the series now writes titles for viewers outside the field). `new_post.py` keeps the part before `｜` as the working title; the blog title is still rewritten as `具体案例：方法` (see `writing.md`).
+- `成片/仿真实拍_*.mp4`: a short clip of our own simulation at real speed, and `*_横屏_手机版.mp4`. The upload and the frames still come from `*_横屏.mp4`.
+- `成片/旧版_*` folders: old cuts, never use them.
+
+Episode numbers changed on 2026-11-10: the old EP13 (真机强化学习) was shelved to be redone and never published as a video, EP13 is now 机器人打球 and EP14 is 视觉编码器.
+The blog still has `ep13-real-world-rl` from the old numbering; check with the user before adding a new `ep13-*` post (two posts would carry `episode: 13`).
 The same episodes are also in the `kepu-video` skill's examples (`~/Developer/kepu-video-skill/`), which hold copies of the storylines, specs and post copy.
 New episodes are made with the `kepu-video` skill; when an episode is finished there, its blog post is the next step here.
 

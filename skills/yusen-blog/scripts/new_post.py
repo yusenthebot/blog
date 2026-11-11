@@ -7,6 +7,8 @@
 For an episode it fills title, tags, date (film mtime), duration (ffprobe) and episode number,
 maps the film for the YouTube uploader, and writes contact sheets to .work/SLUG/.
 Everything it cannot know is left as a TODO for the article pass; nothing is published.
+--dry-run prints the frontmatter and creates nothing; it also warns when the episode number
+is already used by another post.
 """
 
 from __future__ import annotations
@@ -82,6 +84,9 @@ def episode_meta(ep_dir: Path) -> dict:
         raise SystemExit(f"episode folder should start with its number: {ep_dir.name}")
     copy = (ep_dir / "发布文案.md").read_text(encoding="utf-8")
     title = section(copy, "标题").splitlines()[0] if section(copy, "标题") else "TODO"
+    # Since EP13 the social title is "outsider line｜technical line"; keep the first part as a
+    # working title (the blog title is rewritten as 具体案例：方法 during the article pass).
+    title = re.sub(r'"([^"]*)"', r"“\1”", title.split("｜")[0].strip())
     tags = [t for t in re.findall(r"#(\S+)", section(copy, "话题标签")) if t != "科普"][:6]
     film = find_film(ep_dir)
     return {
@@ -93,6 +98,11 @@ def episode_meta(ep_dir: Path) -> dict:
         "duration": film_duration(film),
         "film": film,
     }
+
+
+def episode_of(index_md: Path) -> int | None:
+    m = re.search(r"^episode:\s*(\d+)", index_md.read_text(encoding="utf-8"), re.MULTILINE)
+    return int(m.group(1)) if m else None
 
 
 def frontmatter(meta: dict, series: str, video: bool) -> str:
@@ -115,6 +125,8 @@ def frontmatter(meta: dict, series: str, video: bool) -> str:
     if meta.get("duration"):
         lines.append(f'duration: "{meta["duration"]}"')
     lines.append("platforms: [douyin, tiktok]" if series == "kepu" else "platforms: [xiaohongshu]")
+    if series == "kepu":
+        lines.append('youtubeTitle: "TODO 外行能读懂的一句话，主题名放最后，句号结尾。"')
     lines += [
         "links:",
         '  - label: "TODO Authors (Year). Title."',
@@ -164,6 +176,7 @@ def main() -> None:
     ap.add_argument("--film", type=Path, help="notes: the post's film, if it has one")
     ap.add_argument("--date", help="notes: YYYY-MM-DD the post went out (default: today)")
     ap.add_argument("--title", help="notes: working title")
+    ap.add_argument("--dry-run", action="store_true", help="print the frontmatter, create nothing")
     a = ap.parse_args()
 
     check_root()
@@ -191,6 +204,15 @@ def main() -> None:
             "duration": film_duration(film) if film else None,
         }
         series = "notes"
+
+    if series == "kepu":
+        same = [p.parent.name for p in POSTS.glob("*/index.md") if episode_of(p) == meta["episode"]]
+        if same:
+            print(f"warning: episode {meta['episode']} is already used by {', '.join(same)}", file=sys.stderr)
+    if a.dry_run:
+        print(frontmatter(meta, series, bool(film)), end="")
+        print(f"(dry run: would create {folder}" + (f", map {film.name}" if film else "") + ")", file=sys.stderr)
+        return
 
     folder.mkdir(parents=True)
     (folder / "index.md").write_text(frontmatter(meta, series, bool(film)) + SKELETON, encoding="utf-8")

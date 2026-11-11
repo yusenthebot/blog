@@ -6,7 +6,8 @@
   verify_site.py --base URL      any other copy, e.g. `npm run preview`
 
 Pages come from the repository's posts, not from the home page, so a post that failed to
-build shows up as a 404 here. Exit 1 on any non-200 page or asset, or any KaTeX error.
+build shows up as a 404 here. Exit 1 on any non-200 page or asset, any KaTeX error, or a post
+with a youtube id whose page has no player.
 Fresh deploys can take a minute to reach the CDN; rerun before calling a 404 real.
 """
 
@@ -83,17 +84,27 @@ def main() -> None:
     fixed = [p for p in PAGES if not (a.dev and p.startswith("/sitemap"))]
     pages = [base + p for p in fixed] + [f"{base}/posts/{s}/" for s in slugs]
 
+    # A post with a youtube id must show its player (not the "coming soon" placeholder).
+    videos = {}
+    for s in slugs:
+        m = re.search(r"^youtube:\s*([A-Za-z0-9_-]{11})\s*$", (POSTS / s / "index.md").read_text(), re.MULTILINE)
+        if m:
+            videos[f"{base}/posts/{s}/"] = m.group(1)
+
     failures, assets, katex_errors = 0, set(), 0
     with ThreadPoolExecutor(max_workers=8) as pool:
         for url, (status, html) in zip(pages, pool.map(get, pages)):
             errs = html.count("katex-error")
             katex_errors += errs
             assets |= assets_of(url, html, origin, base_path)
-            bad = status != 200 or errs
+            video = videos.get(url)
+            no_player = bool(video) and f"embed/{video}" not in html
+            bad = status != 200 or errs or no_player
             failures += bool(bad)
             print(
                 f"  {'ok  ' if not bad else 'FAIL'} {status} {url.removeprefix(base)}"
                 + (f"  katex-error x{errs}" if errs else "")
+                + (f"  no player for youtube id {video}" if no_player else "")
             )
         asset_results = list(pool.map(get, sorted(assets)))
     broken = [(u, s) for u, (s, _) in zip(sorted(assets), asset_results) if s != 200]
