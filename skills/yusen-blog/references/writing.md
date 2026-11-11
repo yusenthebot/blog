@@ -71,7 +71,20 @@ coverAlt: 画面描述
 duration: "2:24"            # from ffprobe; kepu, or notes with `video: true`
 platforms: [douyin, tiktok] # notes: [xiaohongshu]
 links: [...]                # references, as above
+youtubeTitle: "没人教，四足机器人怎么自己学会走路，强化学习。"   # kepu: the YouTube-only title
 ```
 
-Leave `youtube` out until the video is uploaded; the page shows a placeholder until then.
+Three titles, three audiences:
+
+| Field | Where it shows | How it reads |
+| --- | --- | --- |
+| `title` | the blog page, cards, RSS | technical: `具体案例：方法`, e.g. 没人教它走路：用 PPO 训练四足机器人的步态 |
+| `youtubeTitle` | YouTube only | the author's X-post style: one plain line a friend outside the field can read, the everyday result or question first, the topic name last, a full stop at the end, at most 100 characters; "最前沿的" is fine for a frontier topic |
+| 发布文案 标题 | 抖音 / 小红书 | written in the kepu-video skill, not here |
+
+Existing `youtubeTitle`s to match in tone: 阿波罗登月背后的算法，扩展卡尔曼滤波。 / 人形机器人被推一把为什么不倒，双足强化学习。 / 看得见不等于拿得住，机器人的触觉。
+Without `youtubeTitle` the uploader falls back to `title | EPnn`.
+
+`youtube` (the 11-character id) is written by the uploader: leave it out until then, and the page shows a placeholder.
+When it is set, add `youtube` to `platforms`.
 `draft: true` keeps a post out of the build.

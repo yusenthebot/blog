@@ -6,7 +6,7 @@
 
 Errors (exit 1): missing frontmatter fields, a credits field, missing or uncaptioned images,
 em dashes, a space before Chinese punctuation, TODO markers left in.
-Warnings: length outside 2500 to 5000 Chinese characters, fewer than 3 display equations,
+Warnings: a kepu post without youtubeTitle, length outside 2500 to 5000 Chinese characters, fewer than 3 display equations,
 no inline paper links, spoken or rhetorical phrasing, Chinese and Latin text without a space.
 Formulas still need a render check (verify_site.py), and links a fetch check (check_links.py).
 """
@@ -26,6 +26,7 @@ REQUIRED_KEPU = ("episode", "duration")
 LENGTH = (2500, 5000)
 # Captions are one-sentence summaries; values and panel walkthroughs go in the text (2026-11-09).
 CAPTION_MAX = 60
+YOUTUBE_TITLE_MAX = 100
 MEASURED = re.compile(
     r"\d[\d.,]*\s*(?:%|％|ms|Hz|N\b|mm|cm|m\b|s\b|kg|g\b|秒|毫秒|厘米|毫米|米|小时|次|轮|个|只|条|步|倍|弧度|度)"
 )
@@ -89,6 +90,24 @@ def check_frontmatter(fm: str, folder: Path, r: Report) -> None:
     yt = re.search(r"^youtube:\s*(\S+)", fm, flags=re.MULTILINE)
     if yt and not re.fullmatch(r"[A-Za-z0-9_-]{11}", yt.group(1).strip("\"'")):
         r.errors.append("youtube must be the 11-character video id, not a URL")
+    kepu = bool(series and series.group(1) == "kepu")
+    platforms = re.search(r"^platforms:\s*\[(.*)\]", fm, flags=re.MULTILINE)
+    on_youtube = bool(platforms and "youtube" in platforms.group(1))
+    if yt and not on_youtube:
+        r.warnings.append("has a youtube id but `platforms` does not list youtube")
+    if on_youtube and not yt:
+        r.errors.append("`platforms` lists youtube but there is no youtube id")
+    yt_title = re.search(r"^youtubeTitle:\s*(.+)$", fm, flags=re.MULTILINE)
+    if yt_title:
+        text = yt_title.group(1).strip().strip("\"'")
+        if len(text) > YOUTUBE_TITLE_MAX:
+            r.errors.append(f"youtubeTitle has {len(text)} characters, YouTube allows {YOUTUBE_TITLE_MAX}")
+        if re.search(r"[<>]", text):
+            r.errors.append("youtubeTitle must not contain < or >")
+        if "：" in text or "|" in text or "｜" in text:
+            r.warnings.append("youtubeTitle reads like a blog title; write one plain sentence, topic last")
+    elif kepu:
+        r.warnings.append("kepu post without youtubeTitle (the upload would fall back to `title | EPnn`)")
     refs = len(re.findall(r"^\s*-\s*label:", fm, flags=re.MULTILINE))
     r.stats["refs"] = refs
     if refs == 0:

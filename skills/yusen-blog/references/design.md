@@ -26,9 +26,24 @@ One accent only; no gradients, glows, scanlines or shadows.
 
 ## Layout
 
+The live layout is the one on `origin/main`; this section was checked against it on 2026-11-11.
+
 - Home: hero (prompt line, `YUSEN_BLOG`, pixel tagline, English lede, POSTS / VIDEOS / UPDATED stats), filter buttons (all, 科普视频, 图文; synced to `?s=`), then a card grid of 3 columns (2 below 960 px, 1 below 640 px). The first visible card is a full-width feature card.
-- Post: title, lede, meta and tags; the video block (click-to-load youtube-nocookie, or the "即将上传到 YouTube" placeholder); the article in a 46 rem column with a sticky 13 rem contents list on the right above 1120 px; `fig-*` images grow into the free left margin (up to 10 rem, never to the right, where the sticky contents list sits); the contents list scrolls on its own when taller than the window; display math scrolls sideways when it overflows; a numbered REFERENCES list; prev/next pager.
-- Header: `YUSEN_BLOG` with a blinking cursor, nav posts / about / ~/home. Footer: rss / github / home.
+- Post: title, lede, meta and tags; the video block (click-to-load youtube-nocookie player, or the "即将上传到 YouTube" placeholder when the post has no id); the article; a numbered REFERENCES list; prev/next pager.
+- The article column (46 rem) is centred on the page at every width. The contents list no longer takes a grid column:
+  - From 1200 px up it is a rail docked to the right edge of the page (`.toc-rail`, absolutely positioned, `clamp(10rem, 14vw, 13rem)` wide) with the list sticky inside it and scrolling on its own when taller than the window.
+  - Below 1200 px it is a collapsed `<details>` box above the article ("文章目录 N 节") that the reader opens; a script opens it on wide screens and closes it on narrow ones.
+- `fig-*` images grow equally on both sides, by at most 5 rem and only as far as leaves 24 px clear of the rail (`--grow`); stills stay at text width. Display math scrolls sideways when it overflows.
+- Header: `YUSEN_BLOG` with a blinking cursor, nav posts / about / YouTube / ~/home. Below 520 px the brand shrinks and the nav wraps to the right. Footer: rss / github / home.
+
+## Motion
+
+Motion is small, functional and off under `prefers-reduced-motion`.
+
+- Reading cursor: the contents list marks the section being read (`aria-current="location"`, found on scroll through one `requestAnimationFrame` per frame) and a 6 px orange square slides along the list's left rule to it in 170 ms. The list scrolls itself to keep the current entry in view.
+- Arriving at a heading from the contents list turns its `##` marker orange, fading back over 720 ms.
+- Home to post: a cross-document view transition (`@view-transition { navigation: auto }`) moves only the `EPnn` badge from the clicked card to the article header in 200 ms; the rest of the page swaps with no fade. The inline script in `Base.astro` names the badge on `pageswap` / `pagereveal` and skips the transition for any other navigation.
+- Keep to this vocabulary: one moving element per interaction, 170 to 200 ms with `cubic-bezier(0.22, 0.7, 0.3, 1)`, the accent colour only. No page fades, parallax or scroll-triggered reveals.
 
 ## Typesetting rules
 
@@ -43,9 +58,9 @@ One accent only; no gradients, glows, scanlines or shadows.
 | File | Holds |
 | --- | --- |
 | `src/styles/global.css` | all styles and tokens |
-| `src/layouts/Base.astro` | head, fonts, header, footer |
+| `src/layouts/Base.astro` | head, fonts, header, footer, the view-transition script |
 | `src/pages/index.astro` | home and the filter script |
-| `src/pages/posts/[slug].astro` | the post page, contents list, references |
+| `src/pages/posts/[slug].astro` | the post page, contents rail and its reading-cursor script, references |
 | `src/components/PostCard.astro`, `Video.astro` | card and video block |
 | `src/lib/rehype-figure.mjs` | image-only paragraphs with a title become `<figure>` with `<figcaption>`; `fig-` files get the wide class; tables get the scroll wrapper and `nw` cells |
 | `src/lib/cjk-words.mjs` | word-level `<wbr>` for Chinese headlines (`wbrHtml`, `rehypeCjkHeadings`) |
@@ -55,5 +70,5 @@ One accent only; no gradients, glows, scanlines or shadows.
 ## Changing the design
 
 Keep the terminal vocabulary (prompts, monospace, hairline boxes) and the one accent.
-After any change: check the home page, one kepu post and one notes post at desktop width and at 375 px (no horizontal scroll), and confirm the pixel fonts loaded (`document.fonts` has "Pixel CJK" and "Pixel ZH" with status loaded).
+After any change: run `scripts/layout_check.js` in the browser pane (every page at 375, 1000, 1199, 1200, 1440 and 1920 px: nothing under the contents rail, no horizontal scroll, no orphaned headline characters), look at the home page, one kepu post and one notes post, and confirm the pixel fonts loaded (`document.fonts` has "Pixel CJK" and "Pixel ZH" with status loaded).
 The user is picky about pixel-level detail: misaligned baselines, uneven gaps and blurry pixel type count as bugs.

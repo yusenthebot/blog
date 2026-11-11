@@ -34,13 +34,26 @@ The build subsets the pixel font to the characters the site uses (`scripts/subse
 
 ## YouTube (gate: the user says upload)
 
-The uploader is `tools/youtube` (uv project `yt-upload`); its README has the one-time Google Cloud setup.
+The channel is https://www.youtube.com/@yusenthebot, linked from the header and the About page.
+The uploader is `tools/youtube` (uv project `yt-upload`); its README has the one-time Google Cloud setup, which is done: the OAuth client and token are in `tools/youtube/.credentials/` (git-ignored; never read, print or copy them).
+State on 2026-11-11: EP01 to EP10 are uploaded and their players are live; EP11 and EP12 have a `youtubeTitle` and wait for an upload; the notes posts have no film (MacMimic's is excluded).
 
-1. The user creates a Desktop-app OAuth client and saves it as `tools/youtube/.credentials/client_secret.json`; never ask for or handle the secret's contents.
-2. `cd tools/youtube && uv run yt-upload auth` once (browser consent, token saved with mode 600).
-3. `uv run yt-upload plan` lists pending uploads: posts with a film in `films.local.json` and no `youtube:` id. `new_post.py` adds the film mapping for new episodes.
-4. `uv run yt-upload upload --privacy private` (default), or `--only SLUG`, `--thumbnail` to set `cover.jpg`. It writes each video id into the post's frontmatter after `duration:`.
-5. Rebuild and push so the player replaces the placeholder; switching videos to public is the user's call in YouTube Studio.
+For a post:
 
-Facts that shape the uploader (YouTube Data API docs, checked 2026-11-09): `videos.insert` uses its own quota bucket of 100 uploads a day, uploads from unverified projects are no longer forced private, and every upload is flagged `containsSyntheticMedia` because the narration is the author's AI-cloned voice.
+1. Write `youtubeTitle` in the frontmatter (`writing.md` has the style); `check_post.py` warns when a kepu post has none.
+2. `cd tools/youtube && uv run yt-upload plan` lists pending uploads without touching the network: posts with a film in `films.local.json` and no `youtube:` id. `new_post.py` adds the film mapping for new episodes.
+3. `uv run yt-upload upload --privacy private` (the default), or `--only SLUG`, `--thumbnail` to set `cover.jpg`. It prints `Channel: ...` before sending anything: confirm it is @yusenthebot. Each finished upload writes its id into the post after `duration:` and is logged in `uploads.local.jsonl`.
+4. Add `youtube` to the post's `platforms`, rebuild and push so the player replaces the placeholder. `verify_site.py` fails a page whose post has an id but no embed.
+5. `uv run yt-upload sync [--only SLUG] [--privacy public]` pushes the post's current title, description and tags to videos that are already up, and optionally changes privacy. It lists every change (old title to new title, old privacy to new) and asks before applying. Use it after editing `youtubeTitle` or `description`; making videos public is the user's call.
+
+What shapes the tool (YouTube Data API docs checked 2026-11-09, limits hit 2026-11-10):
+
+- `videos.insert` has its own quota bucket of 100 uploads a day, but a channel that is not phone-verified stops at 10 uploads a day with `uploadLimitExceeded`. Rerun the next day; finished posts are skipped.
+- Custom thumbnails need a phone-verified channel too; without it the upload still succeeds.
+- The token has the full `youtube` scope (upload, read the channel, edit videos). A token from before a scope change is refused and `auth` asks for consent again.
+- `videos.update` replaces the whole `status` part, so `sync` restates `containsSyntheticMedia: true` (the narration is the author's AI-cloned voice) and `selfDeclaredMadeForKids: false` every time. Keep that if the tool is edited.
+- Behind an HTTP proxy (`HTTPS_PROXY`) the Google client needs PySocks, which is a dependency for that reason.
+- The description is the post's `description`, a link to the blog post and three hashtags; there are no credits.
+
 Never upload the MacMimic film (LAFAN1, CC BY-NC-ND); it is not in the film map on purpose.
+EP1's Earth texture is CC BY 4.0 and its video went up without an attribution line; raise it with the user if descriptions are edited.
