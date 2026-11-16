@@ -4,8 +4,8 @@ description: 从 2 月开始做分层 agentic system，到这几个月 frontier 
 date: 2026-11-16
 series: notes
 tags: [Agentic Robot, 具身智能, System 2, System 1, 系统工程, RSI]
-cover: ./fig-control.png
-coverAlt: System 2、System 1、runtime 与机器人导航和控制的闭环框图
+cover: ./cover-agentic-robot.png
+coverAlt: 分层模型、神经网络和导航系统连接机械臂的三维概念图
 platforms: [xiaohongshu]
 links:
   - label: "CoRL (2026). Workshop on Agentic Robotics."
@@ -35,6 +35,9 @@ links:
   - label: "Yusen (2026). 分层具身系统：从一句话到关节力矩的控制频率层级."
     url: https://yusenthebot.github.io/blog/posts/ep10-fast-slow-brain/
     note: 运行时框图中的仿真配图来自此前视频，不代表本文框架的部署结果
+  - label: "Google DeepMind. MuJoCo Menagerie — Franka Emika Panda."
+    url: https://github.com/google-deepmind/mujoco_menagerie/tree/370c43965323c0944b433b202aac5058b5f907a9/franka_emika_panda
+    note: 封面机械臂采用 Panda 原始视觉网格（源自 Franka 官方 URDF）；Apache-2.0 许可，调整姿态并在 Blender 中重新布景渲染
 ---
 
 今年 2 月我开始做分层的 agentic system，7 月发帖讨论 Agentic Robot 会是下一个大火的方向。
@@ -43,7 +46,7 @@ links:
 到这次 CoRL，Agentic Robot 已经是一个大家认真讨论的方向了。
 现在我想得更多的是，等这套思路普及以后，具身公司接下来半年到底该把精力放在哪里。
 
-![观测进入 System 2 和 System 1，子目标与动作序列经过 runtime 接入导航和控制；执行状态返回模型。网络结构、参数块和信号均为概念示意](./fig-control.png "模型、runtime 与控制闭环；场景为仿真配图，网络、参数和轨迹为示意。")
+![分层模型、神经网络和导航系统连接机械臂的三维概念图](./cover-agentic-robot.png "Blender 概念图：Franka Panda 与分层模型、神经网络和导航系统；模型来源见文末。")
 
 ## 这几个月，模型能做的事变多了
 
@@ -88,6 +91,8 @@ System 1 这边，我也不会把 latency 看成一个长期留给小团队的�
 模型根据画面给出一个合理动作，现场还要保证它看到的画面和机械臂状态对应得上，动作能在要求的时间里执行。
 一次调用超时了，机械臂到底没动、动了一半，还是已经做完，系统得知道，然后才能决定后面怎么继续。
 这些状态最后还要能被查清楚，否则换了模型、换了工位，出了问题还是得靠人守在旁边判断。
+
+![观测进入 System 2 和 System 1，子目标与动作序列经过 runtime 接入导航和控制；执行状态返回模型。网络结构、参数块和信号均为概念示意](./fig-control.png "模型、runtime 与控制闭环；场景为仿真配图，网络、参数和轨迹为示意。")
 
 这也是我从 2 月做分层架构到现在，一直没有改变的判断。
 模型能力可以不断升级，机器人运行的责任仍然要有人承担。
