@@ -1,0 +1,159 @@
+---
+import { SITE } from "../lib/site";
+
+interface Props {
+  title: string;
+  placement: "rail" | "footer";
+}
+
+const { title, placement } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const x = new URL("https://x.com/intent/post");
+x.searchParams.set("text", `${title} / ${SITE.title}`);
+x.searchParams.set("url", canonical);
+const linkedin = new URL("https://www.linkedin.com/sharing/share-offsite/");
+linkedin.searchParams.set("url", canonical);
+const email = `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(canonical)}`;
+---
+
+<nav class:list={["article-share", `article-share--${placement}`]} aria-label="分享文章">
+  <p class="article-share-title">SHARE</p>
+  <ul>
+    <li><a href={x.href} target="_blank" rel="noopener noreferrer">X.com</a></li>
+    <li><a href={linkedin.href} target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
+    <li><a href={email}>Email</a></li>
+    <li data-copy-row hidden><button type="button" data-copy-url>Copy URL</button></li>
+  </ul>
+  <span class="article-share-status" role="status"></span>
+  <input data-share-url type="url" value={canonical} aria-label="文章链接" readonly hidden />
+</nav>
+
+<script>
+  for (const share of document.querySelectorAll(".article-share")) {
+    const copyRow = share.querySelector<HTMLElement>("[data-copy-row]");
+    const button = share.querySelector<HTMLButtonElement>("[data-copy-url]");
+    const input = share.querySelector<HTMLInputElement>("[data-share-url]");
+    const status = share.querySelector<HTMLElement>("[role=status]");
+    if (!copyRow || !button || !input || !status) continue;
+
+    copyRow.hidden = false;
+    let resetTimer: number | undefined;
+    button.addEventListener("click", async () => {
+      window.clearTimeout(resetTimer);
+      try {
+        await navigator.clipboard.writeText(input.value);
+        input.hidden = true;
+        button.textContent = "Copied!";
+        status.textContent = "链接已复制";
+        resetTimer = window.setTimeout(() => {
+          button.textContent = "Copy URL";
+          status.textContent = "";
+        }, 1800);
+      } catch {
+        button.textContent = "Copy URL";
+        status.textContent = "请手动复制选中的链接";
+        input.hidden = false;
+        input.focus();
+        input.select();
+      }
+    });
+  }
+</script>
+
+<style>
+  .article-share {
+    color: var(--muted);
+    font: 12px/1.75 var(--font-mono);
+  }
+
+  .article-share-title {
+    margin: 0 0 5px;
+    letter-spacing: 0.06em;
+  }
+
+  .article-share ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .article-share li {
+    position: relative;
+    padding-inline-start: 12px;
+  }
+
+  .article-share li::before {
+    position: absolute;
+    top: 0.62em;
+    inset-inline-start: 1px;
+    width: 5px;
+    height: 5px;
+    border-inline-start: 1px solid var(--dim);
+    border-bottom: 1px solid var(--dim);
+    content: "";
+  }
+
+  .article-share :is(a, button) {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .article-share :is(a, button):hover {
+    color: var(--text-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .article-share input {
+    width: 100%;
+    margin-top: 7px;
+    padding: 4px;
+    border: 1px solid var(--line-strong);
+    background: var(--bg);
+    color: var(--text-strong);
+    font: inherit;
+  }
+
+  .article-share-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .article-share--rail {
+    display: none;
+  }
+
+  .article-share--footer {
+    margin-top: 28px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (min-width: 1200px) {
+    .article-share--rail {
+      display: block;
+      margin: 20px 0 0;
+      padding-inline: 5px;
+    }
+
+    .article-share--rail ul {
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .article-share--footer {
+      display: none;
+    }
+  }
+</style>

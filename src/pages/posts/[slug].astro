@@ -3,6 +3,7 @@ import "katex/dist/katex.min.css";
 import { render } from "astro:content";
 import { getImage } from "astro:assets";
 import Base from "../../layouts/Base.astro";
+import ArticleShare from "../../components/ArticleShare.astro";
 import Video from "../../components/Video.astro";
 import { getPosts, postPath, type Post } from "../../lib/posts";
 import { SERIES, formatDate, withBase } from "../../lib/site";
@@ -80,9 +81,9 @@ const isVideo = data.series === "kepu" || data.video;
       )
     }
 
-    {
-      toc.length > 2 && (
-        <div class="toc-rail">
+    <div class="toc-rail">
+      <div class="toc-panel">
+        {toc.length > 2 && (
           <details class="toc">
             <summary><span class="px zh-px">文章目录</span><span class="toc-count">{toc.length} 节</span></summary>
             <nav aria-label="文章目录">
@@ -95,9 +96,21 @@ const isVideo = data.series === "kepu" || data.video;
               </ol>
             </nav>
           </details>
+        )}
+        <div class="reading-progress" hidden>
+          <div
+            class="reading-progress-track"
+            role="progressbar"
+            aria-label="阅读进度"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+          ></div>
+          <span aria-hidden="true">00%</span>
         </div>
-      )
-    }
+        <ArticleShare title={data.title} placement="rail" />
+      </div>
+    </div>
 
     <div class="prose">
       <Content />
@@ -135,6 +148,7 @@ const isVideo = data.series === "kepu" || data.video;
       </section>
     )}
 
+    <ArticleShare title={data.title} placement="footer" />
     <nav class="pager" aria-label="按时间继续阅读">
       {
         older && (
@@ -157,22 +171,30 @@ const isVideo = data.series === "kepu" || data.video;
 </Base>
 
 <script>
+  const prose = document.querySelector<HTMLElement>(".article > .prose");
+  const progress = document.querySelector<HTMLElement>(".reading-progress");
+  const track = progress?.querySelector<HTMLElement>(".reading-progress-track");
+  const percentage = progress?.querySelector("span");
   const toc = document.querySelector<HTMLDetailsElement>(".toc");
   const nav = toc?.querySelector("nav");
   const list = nav?.querySelector("ol");
-  if (toc && nav && list) {
-    const wide = matchMedia("(min-width: 1200px)");
-    toc.open = wide.matches;
-    wide.addEventListener("change", ({ matches }) => { toc.open = matches; });
+  if (prose && progress && track && percentage) {
+    if (toc) {
+      const wide = matchMedia("(min-width: 1200px)");
+      toc.open = wide.matches;
+      wide.addEventListener("change", ({ matches }) => { toc.open = matches; });
+    }
 
-    const sections = Array.from(list.querySelectorAll<HTMLAnchorElement>("a")).flatMap((link) => {
+    const sections = Array.from(list?.querySelectorAll<HTMLAnchorElement>("a") ?? []).flatMap((link) => {
       const heading = document.getElementById(decodeURIComponent(link.hash.slice(1)));
       return heading ? [{ link, heading }] : [];
     });
     let current: HTMLAnchorElement | undefined;
+    let lastProgress = -1;
     let frame = 0;
 
     const positionCursor = (link: HTMLAnchorElement) => {
+      if (!list || !nav) return;
       list.style.setProperty("--toc-cursor-y", `${link.offsetTop + link.offsetHeight / 2}px`);
       const { top, bottom } = link.getBoundingClientRect();
       const bounds = nav.getBoundingClientRect();
@@ -180,8 +202,17 @@ const isVideo = data.series === "kepu" || data.video;
       else if (bottom > bounds.bottom) nav.scrollTop += bottom - bounds.bottom;
     };
 
-    const updateSection = () => {
+    const updateReadingPosition = () => {
       frame = 0;
+      const end = prose.getBoundingClientRect().bottom + window.scrollY - window.innerHeight;
+      const progressValue = end <= 0 ? 100 : Math.floor(100 * Math.min(1, Math.max(0, window.scrollY / end)));
+      if (progressValue !== lastProgress) {
+        lastProgress = progressValue;
+        track.style.setProperty("--read-progress", `${progressValue}%`);
+        track.setAttribute("aria-valuenow", String(progressValue));
+        percentage.textContent = `${String(progressValue).padStart(2, "0")}%`;
+      }
+
       let next = sections[0]?.link;
       for (const { link, heading } of sections) {
         if (heading.getBoundingClientRect().top > 144) break;
@@ -191,19 +222,24 @@ const isVideo = data.series === "kepu" || data.video;
       current?.removeAttribute("aria-current");
       current = next;
       current.setAttribute("aria-current", "location");
-      if (toc.open) positionCursor(current);
+      if (toc?.open) positionCursor(current);
     };
 
     function scheduleUpdate() {
-      if (!frame) frame = requestAnimationFrame(updateSection);
+      if (!frame) frame = requestAnimationFrame(updateReadingPosition);
     }
 
     window.addEventListener("scroll", scheduleUpdate, { passive: true });
     window.addEventListener("hashchange", scheduleUpdate);
-    new ResizeObserver(() => {
+    window.addEventListener("resize", scheduleUpdate, { passive: true });
+    window.addEventListener("pageshow", scheduleUpdate);
+    const observer = new ResizeObserver(() => {
       scheduleUpdate();
-      if (toc.open && current) positionCursor(current);
-    }).observe(list);
+      if (toc?.open && current) positionCursor(current);
+    });
+    observer.observe(prose);
+    if (list) observer.observe(list);
+    progress.hidden = false;
     scheduleUpdate();
   }
 </script>

@@ -36,6 +36,8 @@ The live layout is the one on `origin/main`; this section was checked against it
   - Below 1200 px it is a collapsed `<details>` box above the article ("文章目录 N 节") that the reader opens; a script opens it on wide screens and closes it on narrow ones.
 - `fig-*` images grow equally on both sides, by at most 5 rem and only as far as leaves 24 px clear of the rail (`--grow`); stills stay at text width. Display math scrolls sideways when it overflows.
 - Header: `YUSEN_BLOG` with a blinking cursor, nav posts / about / YouTube / ~/home. Below 520 px the brand shrinks and the nav wraps to the right. Footer: rss / github / home.
+- Reading progress: the original pixel track and percentage sit below the contents list on desktop; below 1200 px they stay under the site header. Progress reaches 100% when the end of the article body enters the viewport, before references and related posts.
+- Article sharing: X, LinkedIn, Email and Copy URL sit below the desktop progress track, or after the article and references on smaller screens. X opens a composer with the title and canonical URL; LinkedIn opens its share dialog with that URL. Neither button publishes without the reader's confirmation on the destination platform.
 
 ## Motion
 

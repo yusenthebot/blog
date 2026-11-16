@@ -43,6 +43,7 @@
   --wide: 60rem;
   --page: 72rem;
   --gutter: 16px;
+  --site-header-height: 56px;
 }
 
 *,
@@ -165,7 +166,7 @@ iframe {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  height: 56px;
+  height: var(--site-header-height);
 }
 
 .brand {
@@ -715,6 +716,46 @@ iframe {
   padding-left: 12px;
 }
 
+.reading-progress:not([hidden]) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 4ch;
+  align-items: center;
+  gap: 9px;
+  color: var(--muted);
+  font: 12px/1.4 var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.reading-progress-track {
+  position: relative;
+  height: 10px;
+  background: radial-gradient(circle at 1px 1px, var(--dim) 0.7px, transparent 1px) 0 0 / 4px 4px;
+}
+
+.reading-progress-track::after {
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(var(--accent) 25%, #fae5d9 0 50%, var(--accent) 0 75%, #fae5d9 0) 0 0 / 4px 4px;
+  clip-path: inset(0 calc(100% - var(--read-progress, 0%)) 0 0);
+  content: "";
+}
+
+@media (width < 1200px) {
+  html:has(.reading-progress:not([hidden])) {
+    scroll-padding-top: 90px;
+  }
+
+  .reading-progress {
+    position: fixed;
+    z-index: 59;
+    inset: calc(var(--site-header-height) + 1px) 0 auto;
+    padding: 3px var(--gutter);
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+  }
+}
+
 @media (min-width: 1200px) {
   main > .shell:has(> .article) {
     max-width: none;
@@ -731,9 +772,12 @@ iframe {
     width: var(--toc-width);
   }
 
-  .toc {
+  .toc-panel {
     position: sticky;
     top: 80px;
+  }
+
+  .toc {
     margin: 0;
     padding: 0;
     border: 0;
@@ -741,7 +785,12 @@ iframe {
   }
 
   .toc nav {
-    max-height: calc(100vh - 132px);
+    max-height: max(3rem, calc(100dvh - 304px));
+  }
+
+  .reading-progress {
+    margin-top: 12px;
+    padding: 0 5px;
   }
 }
 
