@@ -4,8 +4,8 @@ description: 从 2 月开始做分层 agentic system，到这几个月 frontier 
 date: 2026-11-16
 series: notes
 tags: [Agentic Robot, 具身智能, System 2, System 1, 系统工程, RSI]
-cover: ./cover.png
-coverAlt: Google Gemini Robotics ER 2 官方发布页中的 Duo 与 Apollo 机器人展示
+cover: ./fig-control.png
+coverAlt: System 2、System 1、runtime 与机器人导航和控制的闭环框图
 platforms: [xiaohongshu]
 links:
   - label: "CoRL (2026). Workshop on Agentic Robotics."
@@ -19,7 +19,7 @@ links:
     note: 官方发布页；文中 RoboDojo 图为该页截图，结果来自厂商内部仿真评测
   - label: "Hansen and Xu (2026). Introducing Gemini Robotics ER 2."
     url: https://blog.google/innovation-and-ai/models-and-research/google-deepmind/gemini-robotics-er-2/
-    note: Google 官方发布页；封面与首图来自该页，讨论视频理解、任务编排和多机器人协作
+    note: Google 官方发布页；正文中的 Gemini Robotics 截图来自该页，讨论视频理解、任务编排和多机器人协作
   - label: "Tang et al. (2026). Training Reasoning Models in Simulation to Natively Use Real Robots."
     url: https://mit-han-lab.github.io/pear-blog/
     note: MIT Han Lab PEAR；在仿真中进行 Robot-Use RL，另有真机迁移实验
@@ -43,13 +43,15 @@ links:
 到这次 CoRL，Agentic Robot 已经是一个大家认真讨论的方向了。
 现在我想得更多的是，等这套思路普及以后，具身公司接下来半年到底该把精力放在哪里。
 
-![Google Gemini Robotics ER 2 官方发布页中的 Duo 与 Apollo 机器人](./cover.png "Google 的 Gemini Robotics ER 2 官方展示截图，来源见参考文献。")
+![观测进入 System 2 和 System 1，子目标与动作序列经过 runtime 接入导航和控制；执行状态返回模型。网络结构、参数块和信号均为概念示意](./fig-control.png "模型、runtime 与控制闭环；场景为仿真配图，网络、参数和轨迹为示意。")
 
 ## 这几个月，模型能做的事变多了
 
 这几个月 OpenAI、Anthropic 和 Google 的进展放在一起看，我的感觉是，通用模型能承担的机器人工作，比我们原来划给它的范围更大。
 Astra 和 Fable 5.2 出现之后，根据视觉和机器人状态直接决定动作的能力已经被展现出来了，Google 的 Gemini Robotics 也在往持续理解视频、跟踪任务和协调执行推进。
 各家的方法还不一样，公开展示离长期稳定运行也有距离，但具身能力跟着通用模型一起进步，这个趋势已经很明显了。
+
+![Google Gemini Robotics ER 2 官方发布页中的 Duo 与 Apollo 机器人](./cover.png "Google 的 Gemini Robotics ER 2 官方展示截图，来源见参考文献。")
 
 ![Anthropic 官方页面中的 RoboDojo 平均成功率对比，包含各模型的推理设置](./still-fable-robodojo.png "Anthropic 发布页的 RoboDojo 仿真评测截图，来源见参考文献。")
 
@@ -86,8 +88,6 @@ System 1 这边，我也不会把 latency 看成一个长期留给小团队的�
 模型根据画面给出一个合理动作，现场还要保证它看到的画面和机械臂状态对应得上，动作能在要求的时间里执行。
 一次调用超时了，机械臂到底没动、动了一半，还是已经做完，系统得知道，然后才能决定后面怎么继续。
 这些状态最后还要能被查清楚，否则换了模型、换了工位，出了问题还是得靠人守在旁边判断。
-
-![观测进入 System 2 和 System 1，子目标与动作序列经过 runtime 接入导航和控制；执行状态返回模型。网络结构、参数块和信号均为概念示意](./fig-control.png "模型、runtime 与控制闭环；场景为仿真配图，网络、参数和轨迹为示意。")
 
 这也是我从 2 月做分层架构到现在，一直没有改变的判断。
 模型能力可以不断升级，机器人运行的责任仍然要有人承担。
