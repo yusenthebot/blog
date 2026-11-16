@@ -17,15 +17,20 @@ const { sources } = Astro.props;
       <button type="submit" autofocus>关闭 <span aria-hidden="true">×</span></button>
     </form>
   </header>
-  <div class="figure-viewer-stage" tabindex="0" aria-label="图表画面">
+  <div class="figure-viewer-stage" tabindex="0" aria-label="图表画面" aria-description="左右键切换图片；放大后 Shift 加左右键移动画面。适合屏幕时可单指左右滑动切图。">
     <p data-figure-status role="status">正在加载原图</p>
     <img alt="" draggable="false" hidden />
   </div>
   <footer class="figure-viewer-footer">
     <p data-figure-caption></p>
+    <div class="figure-viewer-navigation" role="group" aria-label="切换图片">
+      <button type="button" data-previous aria-label="上一张" aria-keyshortcuts="ArrowLeft" title="上一张（←）；放大后 Shift + ← 移动画面">←</button>
+      <output data-position aria-label="图片序号" aria-live="polite" aria-atomic="true"></output>
+      <button type="button" data-next aria-label="下一张" aria-keyshortcuts="ArrowRight" title="下一张（→）；放大后 Shift + → 移动画面">→</button>
+    </div>
     <div class="figure-viewer-tools" role="group" aria-label="图表缩放">
       <button type="button" data-zoom-out aria-label="缩小" disabled>−</button>
-      <output aria-label="缩放比例"></output>
+      <output data-zoom-percent aria-label="缩放比例"></output>
       <button type="button" data-zoom-in aria-label="放大" disabled>+</button>
       <button type="button" data-fit disabled>适合屏幕</button>
       <button type="button" data-actual disabled>原尺寸</button>
@@ -41,11 +46,14 @@ const { sources } = Astro.props;
     const sources: Record<string, string> = JSON.parse(viewer.dataset.sources ?? "{}");
     const original = viewer.querySelector("a")!;
     const stage = viewer.querySelector<HTMLElement>(".figure-viewer-stage")!;
-    const image = stage.querySelector("img")!;
+    let image = stage.querySelector("img")!;
     const status = stage.querySelector<HTMLElement>("[data-figure-status]")!;
     const caption = viewer.querySelector("[data-figure-caption]")!;
     const size = viewer.querySelector("[data-figure-size]")!;
-    const percent = viewer.querySelector("output")!;
+    const percent = viewer.querySelector<HTMLOutputElement>("[data-zoom-percent]")!;
+    const position = viewer.querySelector<HTMLOutputElement>("[data-position]")!;
+    const previousButton = viewer.querySelector<HTMLButtonElement>("[data-previous]")!;
+    const nextButton = viewer.querySelector<HTMLButtonElement>("[data-next]")!;
     const zoomOut = viewer.querySelector<HTMLButtonElement>("[data-zoom-out]")!;
     const zoomIn = viewer.querySelector<HTMLButtonElement>("[data-zoom-in]")!;
     const fitButton = viewer.querySelector<HTMLButtonElement>("[data-fit]")!;
@@ -58,6 +66,9 @@ const { sources } = Astro.props;
     let zoom = 1;
     let fittedZoom = 1;
     let activeTrigger: HTMLAnchorElement | undefined;
+    const entries: { trigger: HTMLAnchorElement; thumbnail: HTMLImageElement }[] = [];
+    let currentIndex = -1;
+    let swipe: (Point & { pointerId: number }) | undefined;
 
     const fit = () => Math.min(1,
       (stage.clientWidth - stagePadding) / image.naturalWidth,
@@ -97,6 +108,42 @@ const { sources } = Astro.props;
       setZoom(fit());
     };
 
+    const selectImage = (index: number) => {
+      if (index < 0 || index >= entries.length) return;
+      currentIndex = index;
+      const { trigger, thumbnail } = entries[index];
+      pointers.clear();
+      swipe = undefined;
+      // A fresh element prevents a late load/error from the previous image updating this one.
+      const nextImage = document.createElement("img");
+      nextImage.hidden = true;
+      nextImage.draggable = false;
+      nextImage.alt = thumbnail.alt;
+      image.replaceWith(nextImage);
+      image = nextImage;
+      caption.textContent = thumbnail.closest("figure")?.querySelector("figcaption")?.textContent ?? thumbnail.alt;
+      original.href = trigger.href;
+      position.value = `${index + 1} / ${entries.length}`;
+      previousButton.setAttribute("aria-disabled", String(index === 0));
+      nextButton.setAttribute("aria-disabled", String(index === entries.length - 1));
+      status.hidden = false;
+      status.textContent = "正在加载原图";
+      size.textContent = "";
+      percent.value = "";
+      if ([zoomOut, zoomIn, fitButton, actualButton].includes(document.activeElement as HTMLButtonElement)) {
+        stage.focus({ preventScroll: true });
+      }
+      [zoomOut, zoomIn, fitButton, actualButton].forEach((button) => { button.disabled = true; });
+      stage.scrollTo(0, 0);
+      nextImage.addEventListener("load", () => {
+        if (image === nextImage && viewer.open && nextImage.naturalWidth) showImage();
+      });
+      nextImage.addEventListener("error", () => {
+        if (image === nextImage) status.textContent = "原图加载失败，可用上方链接重试。";
+      });
+      nextImage.src = original.href;
+    };
+
     thumbnails.forEach((thumbnail) => {
       // Preserve author-supplied links rather than nesting a second anchor inside them.
       if (thumbnail.closest("a")) return;
@@ -113,32 +160,32 @@ const { sources } = Astro.props;
       hint.textContent = "放大图片 ↗";
       thumbnail.replaceWith(trigger);
       trigger.append(thumbnail, hint);
+      const index = entries.push({ trigger, thumbnail }) - 1;
 
       trigger.addEventListener("click", (event) => {
         if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         event.preventDefault();
         activeTrigger = trigger;
-        pointers.clear();
-        image.hidden = true;
-        image.removeAttribute("src");
-        image.alt = thumbnail.alt;
-        caption.textContent = thumbnail.closest("figure")?.querySelector("figcaption")?.textContent ?? thumbnail.alt;
-        original.href = trigger.href;
-        status.hidden = false;
-        status.textContent = "正在加载原图";
-        size.textContent = "";
-        percent.value = "";
-        [zoomOut, zoomIn, fitButton, actualButton].forEach((button) => { button.disabled = true; });
-        stage.scrollTo(0, 0);
         viewer.showModal();
-        image.src = original.href;
+        selectImage(index);
       });
     });
 
-    image.addEventListener("load", () => { if (viewer.open) showImage(); });
-    image.addEventListener("error", () => { status.textContent = "原图加载失败，可用上方链接重试。"; });
+    previousButton.addEventListener("click", () => selectImage(currentIndex - 1));
+    nextButton.addEventListener("click", () => selectImage(currentIndex + 1));
+    viewer.addEventListener("keydown", (event) => {
+      if (event.altKey || event.ctrlKey || event.metaKey) return;
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      event.preventDefault();
+      if (event.shiftKey) {
+        stage.scrollLeft += event.key === "ArrowRight" ? 80 : -80;
+        return;
+      }
+      selectImage(currentIndex + (event.key === "ArrowRight" ? 1 : -1));
+    });
     viewer.addEventListener("close", () => {
       pointers.clear();
+      swipe = undefined;
       activeTrigger?.focus({ preventScroll: true });
     });
 
@@ -165,6 +212,11 @@ const { sources } = Astro.props;
     stage.addEventListener("pointerdown", (event) => {
       if (image.hidden || event.button !== 0 || pointers.size >= 2) return;
       pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (pointers.size === 1 && event.pointerType === "touch" && zoom <= fittedZoom + 0.001) {
+        swipe = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+      } else {
+        swipe = undefined;
+      }
       stage.setPointerCapture(event.pointerId);
     });
 
@@ -191,7 +243,23 @@ const { sources } = Astro.props;
       }
     });
 
-    stage.addEventListener("lostpointercapture", (event) => pointers.delete(event.pointerId));
+    stage.addEventListener("pointerup", (event) => {
+      const start = swipe;
+      swipe = undefined;
+      pointers.delete(event.pointerId);
+      if (!start || start.pointerId !== event.pointerId) return;
+      const dx = event.clientX - start.x;
+      const dy = event.clientY - start.y;
+      if (Math.abs(dx) >= 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        selectImage(currentIndex + (dx < 0 ? 1 : -1));
+      }
+    });
+    const cancelPointer = (event: PointerEvent) => {
+      pointers.delete(event.pointerId);
+      swipe = undefined;
+    };
+    stage.addEventListener("pointercancel", cancelPointer);
+    stage.addEventListener("lostpointercapture", cancelPointer);
   }
 </script>
 
@@ -327,23 +395,28 @@ const { sources } = Astro.props;
 
   .figure-viewer-stage p { margin: auto; }
 
-  .figure-viewer-tools {
+  .figure-viewer-tools,
+  .figure-viewer-navigation {
     display: flex;
     align-items: center;
     gap: 6px;
     flex: none;
   }
 
-  .figure-viewer-tools output {
+  .figure-viewer-tools output,
+  .figure-viewer-navigation output {
     min-width: 4ch;
     color: #ffb18c;
     text-align: center;
   }
 
+  .figure-viewer-navigation output { min-width: 6ch; }
+
   @media (max-width: 640px) {
     .figure-viewer-header { gap: 8px; }
     .figure-viewer-footer { flex-wrap: wrap; }
     .figure-viewer-footer > p { flex-basis: 100%; }
+    .figure-viewer-navigation { flex-basis: 100%; justify-content: center; }
     .figure-viewer-tools { margin-inline: auto; }
   }
 </style>
