@@ -1,18 +1,18 @@
 ---
 interface Props {
-  source: string;
+  sources: Record<string, string>;
 }
 
-const { source } = Astro.props;
+const { sources } = Astro.props;
 ---
 
-<dialog class="figure-viewer" aria-labelledby="figure-viewer-title">
+<dialog class="figure-viewer" aria-labelledby="figure-viewer-title" data-sources={JSON.stringify(sources)}>
   <header class="figure-viewer-header">
     <div>
       <h2 id="figure-viewer-title">图表原图</h2>
       <span data-figure-size></span>
     </div>
-    <a href={source} target="_blank" rel="noopener">打开 PNG ↗</a>
+    <a target="_blank" rel="noopener">打开原图 ↗</a>
     <form method="dialog">
       <button type="submit" autofocus>关闭 <span aria-hidden="true">×</span></button>
     </form>
@@ -35,10 +35,10 @@ const { source } = Astro.props;
 
 <script>
   const viewer = document.querySelector<HTMLDialogElement>(".figure-viewer");
-  const figure = document.querySelector<HTMLElement>(".prose figure.fig.wide");
-  const thumbnail = figure?.querySelector("img");
+  const thumbnails = document.querySelectorAll<HTMLImageElement>(".prose img");
 
-  if (viewer && figure && thumbnail && typeof viewer.showModal === "function") {
+  if (viewer && thumbnails.length && typeof viewer.showModal === "function") {
+    const sources: Record<string, string> = JSON.parse(viewer.dataset.sources ?? "{}");
     const original = viewer.querySelector("a")!;
     const stage = viewer.querySelector<HTMLElement>(".figure-viewer-stage")!;
     const image = stage.querySelector("img")!;
@@ -57,21 +57,7 @@ const { source } = Astro.props;
     const pointers = new Map<number, Point>();
     let zoom = 1;
     let fittedZoom = 1;
-
-    const trigger = document.createElement("a");
-    trigger.className = "figure-open";
-    trigger.href = original.href;
-    trigger.target = "_blank";
-    trigger.rel = "noopener";
-    trigger.setAttribute("aria-haspopup", "dialog");
-    trigger.setAttribute("aria-label", `放大图表：${thumbnail.alt}`);
-    const hint = document.createElement("span");
-    hint.textContent = "放大图表 ↗";
-    thumbnail.replaceWith(trigger);
-    trigger.append(thumbnail, hint);
-
-    image.alt = thumbnail.alt;
-    caption.textContent = figure.querySelector("figcaption")?.textContent ?? thumbnail.alt;
+    let activeTrigger: HTMLAnchorElement | undefined;
 
     const fit = () => Math.min(1,
       (stage.clientWidth - stagePadding) / image.naturalWidth,
@@ -107,26 +93,53 @@ const { source } = Astro.props;
       image.style.width = `${image.naturalWidth * fit()}px`;
       image.hidden = false;
       status.hidden = true;
-      size.textContent = `PNG · ${image.naturalWidth} × ${image.naturalHeight}`;
+      size.textContent = `${image.naturalWidth} × ${image.naturalHeight}`;
       setZoom(fit());
     };
 
-    trigger.addEventListener("click", (event) => {
-      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      event.preventDefault();
-      viewer.showModal();
-      if (image.naturalWidth) showImage();
-      else {
+    thumbnails.forEach((thumbnail) => {
+      // Preserve author-supplied links rather than nesting a second anchor inside them.
+      if (thumbnail.closest("a")) return;
+      const authoredSource = thumbnail.dataset.originalSrc ?? "";
+      const source = sources[authoredSource.replace(/^\.\//, "")] ?? (thumbnail.currentSrc || thumbnail.src);
+      const trigger = document.createElement("a");
+      trigger.className = "figure-open";
+      trigger.href = source;
+      trigger.target = "_blank";
+      trigger.rel = "noopener";
+      trigger.setAttribute("aria-haspopup", "dialog");
+      trigger.setAttribute("aria-label", `放大图片：${thumbnail.alt || "正文配图"}`);
+      const hint = document.createElement("span");
+      hint.textContent = "放大图片 ↗";
+      thumbnail.replaceWith(trigger);
+      trigger.append(thumbnail, hint);
+
+      trigger.addEventListener("click", (event) => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        activeTrigger = trigger;
+        pointers.clear();
+        image.hidden = true;
+        image.removeAttribute("src");
+        image.alt = thumbnail.alt;
+        caption.textContent = thumbnail.closest("figure")?.querySelector("figcaption")?.textContent ?? thumbnail.alt;
+        original.href = trigger.href;
+        status.hidden = false;
         status.textContent = "正在加载原图";
+        size.textContent = "";
+        percent.value = "";
+        [zoomOut, zoomIn, fitButton, actualButton].forEach((button) => { button.disabled = true; });
+        stage.scrollTo(0, 0);
+        viewer.showModal();
         image.src = original.href;
-      }
+      });
     });
 
     image.addEventListener("load", () => { if (viewer.open) showImage(); });
     image.addEventListener("error", () => { status.textContent = "原图加载失败，可用上方链接重试。"; });
     viewer.addEventListener("close", () => {
       pointers.clear();
-      trigger.focus({ preventScroll: true });
+      activeTrigger?.focus({ preventScroll: true });
     });
 
     new ResizeObserver(() => {

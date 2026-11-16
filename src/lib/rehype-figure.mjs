@@ -52,5 +52,15 @@ function walk(node) {
 }
 
 export function rehypeFigure() {
-  return (tree) => walk(tree);
+  return (tree) => {
+    // Preserve the authored source before Astro replaces src with an optimized image.
+    const markImages = (node) => {
+      if (node.type === "element" && node.tagName === "img" && node.properties?.src) {
+        node.properties["data-original-src"] = node.properties.src;
+      }
+      (node.children ?? []).forEach(markImages);
+    };
+    markImages(tree);
+    walk(tree);
+  };
 }

@@ -14,3 +14,5 @@ Compared all existing local and fetched remote branches with `main`, checking bo
 No other feature commits were found outside main. The old branch still has three commits absent from main's ancestry because their functionality was ported into the current layout rather than merging the old template wholesale. Do not infer missing features from `git cherry` alone.
 
 For future releases, compare outstanding branch commits by feature, then check the built pages. Keep the existing scope of opt-in features unless an expansion is requested.
+
+Follow-up: the user requested the viewer on every article and every body image. The two-post allowlist has now been replaced by automatic original-image mapping, including all six images in `agentic-robot-next-half`.
