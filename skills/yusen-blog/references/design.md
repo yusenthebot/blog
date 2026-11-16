@@ -38,6 +38,7 @@ The live layout is the one on `origin/main`; this section was checked against it
 - Header: `YUSEN_BLOG` with a blinking cursor, nav posts / about / YouTube / ~/home. Below 520 px the brand shrinks and the nav wraps to the right. Footer: rss / github / home.
 - Reading progress: the original pixel track and percentage sit below the contents list on desktop; below 1200 px they stay under the site header. Progress reaches 100% when the end of the article body enters the viewport, before references and related posts.
 - Article sharing: X, LinkedIn, Email and Copy URL sit below the desktop progress track, or after the article and references on smaller screens. X opens a composer with the title and canonical URL; LinkedIn opens its share dialog with that URL. Neither button publishes without the reader's confirmation on the destination platform.
+- Figure viewer: EP10 and MacMimic retain the original development branch's full-screen viewer for their main diagram, with zoom, pan, fit, actual size and a link to the original PNG. The explicit `originalFigures` map in the post template controls this scope. Close/Escape returns focus to the diagram; loading failures keep the original-file link available.
 
 ## Motion
 
